@@ -1,0 +1,11 @@
+﻿venv/
+__pycache__/
+*.pyc
+.env
+.secret_key
+database/*.db
+database/*.db-wal
+database/*.db-shm
+backup_*.db
+static/images/products/
+static/images/qris/

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Rollicios{% endblock %} — Rollicios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+  <script>
+    // pasang tema sebelum render supaya tidak berkedip
+    try { document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark'; } catch (e) {}
+  </script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <!-- definisi gradasi kulit risol (dipakai semua ilustrasi) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="crust" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#f6c15a"/><stop offset=".45" stop-color="#e59a34"/><stop offset="1" stop-color="#b9651a"/>
+      </linearGradient>
+      <pattern id="crumb" width="12" height="12" patternUnits="userSpaceOnUse">
+        <circle cx="3" cy="3" r="1.3" fill="#fff3d0" opacity=".38"/><circle cx="9" cy="7" r="1.1" fill="#7a3d0a" opacity=".3"/>
+        <circle cx="5" cy="10.5" r=".9" fill="#fff3d0" opacity=".25"/><circle cx="11" cy="1.5" r=".8" fill="#7a3d0a" opacity=".25"/>
+      </pattern>
+    </defs>
+  </svg>
+  <a class="skip" href="#main">Lewati ke konten</a>
+
+  {% block nav %}
+  <header class="nav-wrap">
+    <nav class="nav" aria-label="Navigasi utama">
+      <a class="brand" href="{{ url_for('home') }}"><span class="brand-dot"></span>rollicios</a>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="{{ 'on' if request.endpoint == 'home' }}">Beranda</a>
+        <a href="{{ url_for('products') }}" class="{{ 'on' if request.endpoint in ('products','product_detail') }}">Produk</a>
+        <a href="{{ url_for('orders') }}" class="{{ 'on' if request.endpoint in ('orders','payment') }}">Pesanan</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn-round ghost" id="themeBtn" aria-label="Ganti tema terang/gelap">◐</button>
+        <a class="cart-link" href="{{ url_for('cart') }}" aria-label="Keranjang">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h13l-1.3 8.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.7L5.5 4H3"/><circle cx="10" cy="20.5" r="1"/><circle cx="17" cy="20.5" r="1"/></svg>
+          <span class="badge" id="cartBadge" {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
+        </a>
+        {% if cur_user %}
+          <a class="hello" href="{{ url_for('account') }}" title="Profil saya">{{ cur_user.nama.split()[0] }}</a>
+          <a class="btn sm ghost" href="{{ url_for('logout') }}">Keluar</a>
+        {% else %}
+          <a class="btn sm ghost" href="{{ url_for('login') }}">Masuk</a>
+          <a class="btn sm" href="{{ url_for('register') }}">Daftar</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+  {% endblock %}
+
+  <main id="main">{% block content %}{% endblock %}</main>
+
+  {% block footer %}
+  <footer class="footer">
+    <div class="wrap foot-grid">
+      <div>
+        <a class="brand" href="{{ url_for('home') }}"><span class="brand-dot"></span>rollicios</a>
+        <p class="mute">Risol lumer dengan empat pilihan rasa: mayo, keju, coklat, dan matcha.</p>
+      </div>
+      <div>
+        <h4>Belanja</h4>
+        <a href="{{ url_for('products') }}">Semua produk</a>
+        <a href="{{ url_for('cart') }}">Keranjang</a>
+        <a href="{{ url_for('orders') }}">Pesanan saya</a>
+      </div>
+      <div>
+        <h4>Instagram</h4>
+         <a href="{{ url_for('login') }}">Masuk</a>
+<a href="https://www.instagram.com/username_rollicios/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <div>
+        <h4><a href="{{ url_for('team_index') }}">Tim kami</a></h4>
+        {% for m in team_members %}<a class="team-link" href="{{ url_for('team_member', slug=m.slug) }}"><i class="tdot t-{{ m.tema }}"></i>{{ m.nama }}</a>{% endfor %}
+      </div>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <div id="toasts" class="toasts" aria-live="polite" data-flash='{{ get_flashed_messages(with_categories=true)|tojson }}'></div>
+  <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

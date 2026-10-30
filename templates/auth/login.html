@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Masuk{% endblock %}
+{% block body_class %}no-nav{% endblock %}
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="auth">
+  {% set quote = 'Masuk untuk melihat keranjang dan riwayat pesananmu.' %}
+  {% include 'auth/_visual.html' %}
+  <div class="auth-panel">
+    <form method="post" class="auth-form" novalidate>
+      <h1>Masuk</h1>
+      <p class="mute">Pakai nomor telepon yang kamu daftarkan.</p>
+      <label class="field"><span>Nomor telepon</span>
+        <input type="tel" name="no_telepon" inputmode="numeric" placeholder="08123456789" required autofocus autocomplete="tel"></label>
+      <label class="field"><span>Password</span>
+        <div class="pw"><input type="password" name="password" placeholder="Password kamu" required autocomplete="current-password">
+          <button type="button" class="pw-toggle" aria-label="Tampilkan password">tampil</button></div></label>
+      <button class="btn block" type="submit">Masuk</button>
+      <p class="mute center">Belum punya akun? <a href="{{ url_for('register') }}">Daftar gratis</a></p>
+      <p class="mute center small"><a href="{{ url_for('home') }}">Kembali ke toko</a></p>
+    </form>
+  </div>
+</section>
+{% endblock %}

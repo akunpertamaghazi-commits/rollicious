@@ -1,0 +1,54 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Pesanan{% endblock %}
+{% block page_title %}Pesanan{% endblock %}
+{% block admin_content %}
+<div class="chips">
+  <a href="{{ url_for('admin_orders') }}" class="{{ 'on' if not st }}">Semua</a>
+  {% for k, v in labels.items() if k in ('menunggu_pembayaran','menunggu_verifikasi','lunas','diproses','dikirim','selesai','dibatalkan','refund') %}
+  <a href="{{ url_for('admin_orders', status=k) }}" class="{{ 'on' if st == k }}">{{ v }}</a>{% endfor %}
+</div>
+<div class="stack">
+{% for d in data %}{% set o = d.o %}
+  <article class="panel order">
+    <header class="order-head">
+      <div><h2 class="h3">Pesanan #{{ o.id }} · {{ o.nama }}</h2><p class="mute small">{{ o.no_telepon }} · {{ o.created_at|tgl }}</p></div>
+      <span class="pill s-{{ o.status_order }}">{{ o.status_order|status }}</span>
+    </header>
+    {% if o.alamat %}<p class="mute small">Alamat: {{ o.alamat }}</p>{% endif %}
+    {% if o.kurir %}<p class="ship-info">Kurir <b>{{ o.kurir }}</b>{% if o.no_resi %} · resi <code>{{ o.no_resi }}</code>{% endif %}{% if o.dikirim_at %} · dikirim {{ o.dikirim_at|tgl }}{% endif %}</p>{% endif %}
+    <ul class="lines">{% for it in d['items'] %}<li><span>{{ it.nama }} <span class="mute">× {{ it.jumlah }}</span></span><span>{{ it.subtotal|rupiah }}</span></li>{% endfor %}</ul>
+    <footer class="order-foot">
+      <strong>{{ o.total|rupiah }}</strong>
+      <div class="row-gap">
+        {% if o.status_order in ('lunas','diproses','dikirim') %}
+          {% set nxt = {'lunas':'diproses','diproses':'dikirim','dikirim':'selesai'}[o.status_order] %}
+          {% if nxt != 'dikirim' %}
+          <form method="post" action="{{ url_for('admin_order_status', oid=o.id) }}"><input type="hidden" name="status" value="{{ nxt }}"><button class="btn sm">Tandai {{ nxt|status|lower }}</button></form>
+          {% endif %}
+        {% endif %}
+        {% if o.status_order == 'menunggu_verifikasi' %}<a class="btn sm" href="{{ url_for('admin_payments', status='menunggu_verifikasi') }}">Verifikasi pembayaran</a>{% endif %}
+        {% if o.status_order in ('menunggu_pembayaran','menunggu_verifikasi') %}
+          <form method="post" action="{{ url_for('admin_order_status', oid=o.id) }}" onsubmit="return confirm('Batalkan pesanan ini?')"><input type="hidden" name="status" value="dibatalkan"><button class="btn sm danger">Batalkan</button></form>
+        {% endif %}
+      </div>
+    </footer>
+    {% if o.status_order in ('lunas','diproses','dikirim') %}
+    <form method="post" action="{{ url_for('admin_ship', oid=o.id) }}" class="ship-form">
+      <select name="kurir" aria-label="Kurir">{% for k in kurir_list %}<option {{ 'selected' if o.kurir == k }}>{{ k }}</option>{% endfor %}</select>
+      <input name="no_resi" value="{{ o.no_resi or '' }}" placeholder="Nomor resi" maxlength="40" aria-label="Nomor resi">
+      <button class="btn sm" type="submit">{{ 'Perbarui resi' if o.status_order == 'dikirim' else 'Kirim pesanan' }}</button>
+    </form>
+    {% endif %}
+    {% if o.pay_status in ('lunas','terlambat') %}
+    <details class="more"><summary>Refund pesanan ini</summary>
+      <form method="post" action="{{ url_for('admin_refund', oid=o.id) }}" class="ship-form">
+        <input name="alasan" placeholder="Alasan refund" required minlength="3" maxlength="200" aria-label="Alasan refund">
+        <label class="check"><input type="checkbox" name="restock" value="1" checked> Kembalikan stok</label>
+        <button class="btn sm danger" type="submit" onclick="return confirm('Refund penuh pesanan #{{ o.id }}? Tindakan ini tercatat di kas dan audit log.')">Proses refund</button>
+      </form>
+    </details>
+    {% endif %}
+  </article>
+{% else %}<div class="panel"><p class="mute">Tidak ada pesanan pada filter ini.</p></div>{% endfor %}
+</div>
+{% endblock %}

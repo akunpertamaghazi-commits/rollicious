@@ -1,0 +1,8 @@
+{% from '_macros.html' import risol %}
+<div class="auth-visual" aria-hidden="true">
+  <a class="brand" href="{{ url_for('home') }}"><span class="brand-dot"></span>rollicios</a>
+  <div class="auth-risols">
+    {{ risol('mayo','loop','0s') }}{{ risol('keju','loop','-1.4s') }}{{ risol('coklat','loop','-2.8s') }}{{ risol('matcha','loop','-4.2s') }}
+  </div>
+  <p class="auth-quote">{{ quote }}</p>
+</div>

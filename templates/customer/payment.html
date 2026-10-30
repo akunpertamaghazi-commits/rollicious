@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import risol %}
+{% block title %}Pembayaran #{{ o.id }}{% endblock %}
+{% block head %}{% if pay.gateway == 'midtrans' and pay.status == 'belum_bayar' %}<noscript><meta http-equiv="refresh" content="6"></noscript>{% endif %}{% endblock %}
+{% block content %}
+<section class="wrap page-head">
+  <div>
+    <a class="crumb" href="{{ url_for('orders') }}">‹ Pesanan saya</a>
+    <h1 class="h1">Pembayaran pesanan #{{ o.id }}</h1>
+  </div>
+  {% if pay.gateway == 'midtrans' and pay.status == 'belum_bayar' %}
+  <span class="pill s-menunggu_pembayaran" id="payPill"><i class="mini-spin"></i>Menunggu pembayaran</span>
+  {% elif pay.status == 'lunas' %}<span class="pill s-lunas" id="payPill">Berhasil</span>
+  {% elif pay.status in ('kedaluwarsa','gagal','dibatalkan') %}<span class="pill s-gagal" id="payPill">Gagal</span>
+  {% else %}<span class="pill s-{{ pay.status }}" id="payPill">{{ pay.status|status }}</span>{% endif %}
+</section>
+
+<section class="wrap pay-grid">
+  <div class="panel qris-panel" data-ref="{{ pay.payment_reference }}" data-status="{{ pay.status }}" data-oid="{{ o.id }}"
+       data-gateway="{{ '1' if pay.gateway else '0' }}" data-expires="{{ pay.expires_at or '' }}">
+    {% if pay.status == 'belum_bayar' and gw_enabled and pay.gateway != 'midtrans' %}
+      <div class="state">
+        <h2 class="h3">QRIS belum dibuat</h2>
+        <p class="mute">Pesananmu sudah tersimpan. Tekan tombol di bawah untuk membuat QRIS sesuai nominal.</p>
+        <form method="post" action="{{ url_for('payment_create_qris', oid=o.id) }}"><button class="btn lg" type="submit">Buat QRIS</button></form>
+      </div>
+      <form method="post" action="{{ url_for('order_cancel', oid=o.id) }}" onsubmit="return confirm('Batalkan pesanan ini?')">
+        <button class="btn ghost block" type="submit">Batalkan pesanan</button>
+      </form>
+
+    {% elif pay.status == 'belum_bayar' and pay.gateway == 'midtrans' %}
+      <div class="qr-frame">
+        <img src="{{ url_for('payment_qr', oid=o.id) }}" alt="QRIS pembayaran pesanan #{{ o.id }}">
+        <div class="qr-scan" aria-hidden="true"></div>
+      </div>
+      <p class="center mute">Scan dengan aplikasi bank / e-wallet apa pun</p>
+      <p class="price big center">{{ pay.jumlah|rupiah }}</p>
+      <p class="center mute small">Nominal sudah otomatis terisi di QR ini, kamu tidak perlu mengetik apa pun.</p>
+      <div class="wait-box" id="waitBox" role="status" aria-live="polite">
+        <div class="wait-risol">{{ risol('keju', 'loop') }}</div>
+        <div>
+          <strong id="waitTitle">Menunggu pembayaran<span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></strong>
+          <p class="mute small" id="waitText">Jangan tutup halaman ini. Status berubah otomatis begitu pembayaranmu masuk.</p>
+        </div>
+      </div>
+      {% if pay.expires_at %}<p class="center countdown" id="countdown" aria-live="polite">Berlaku hingga {{ pay.expires_at|tgl }}</p>{% endif %}
+      {% if sandbox %}<p class="notice soon center">Mode uji (sandbox): QR ini hanya bisa dibayar lewat simulator Midtrans, bukan uang sungguhan.</p>{% endif %}
+      <form method="post" action="{{ url_for('order_cancel', oid=o.id) }}" onsubmit="return confirm('Batalkan pesanan ini?')">
+        <button class="btn ghost block" type="submit">Batalkan pesanan</button>
+      </form>
+
+    {% elif pay.status in ('belum_bayar','ditolak') %}
+      {% if pay.status == 'ditolak' %}
+      <p class="notice bad">Pembayaranmu belum bisa diverifikasi admin. Pastikan nominal sesuai, lalu konfirmasi ulang.</p>
+      {% endif %}
+      <div class="qr-frame">
+        {% if qris_file %}
+          <img src="{{ url_for('static', filename='images/qris/' + qris_file) }}" alt="Kode QRIS toko">
+        {% else %}
+          <canvas id="qrCanvas" width="232" height="232" aria-label="Contoh kode QRIS"></canvas>
+        {% endif %}
+        <div class="qr-scan" aria-hidden="true"></div>
+      </div>
+      {% if not qris_file %}
+      <p class="mute small center">Ini QR contoh. Letakkan gambar QRIS asli di <code>static/images/qris/qris.png</code>.</p>
+      {% endif %}
+      <p class="center mute">Scan lalu bayar tepat</p>
+      <p class="price big center">{{ pay.jumlah|rupiah }}</p>
+      <p class="center mute small">Referensi: <code>{{ pay.payment_reference }}</code></p>
+      <form method="post" action="{{ url_for('payment_confirm', oid=o.id) }}">
+        <button class="btn lg block" type="submit">Saya sudah bayar</button>
+      </form>
+      <form method="post" action="{{ url_for('order_cancel', oid=o.id) }}" onsubmit="return confirm('Batalkan pesanan ini?')">
+        <button class="btn ghost block" type="submit">Batalkan pesanan</button>
+      </form>
+
+    {% elif pay.status == 'menunggu_verifikasi' %}
+      <div class="state"><div class="spinner"></div>
+        <h2 class="h3">Menunggu verifikasi admin</h2>
+        <p class="mute">Halaman ini diperbarui otomatis begitu pembayaranmu dicek.</p></div>
+
+    {% elif pay.status == 'lunas' %}
+      <div class="state ok result">
+        <div class="burst"><div class="check">✓</div></div>
+        <h2 class="h2">Pembayaran berhasil</h2>
+        <p class="price big">{{ pay.jumlah|rupiah }}</p>
+        <p class="mute">Dibayar pada {{ pay.paid_at|tgl }}. Pesananmu sedang disiapkan.</p>
+        <p class="mute small">Referensi: <code>{{ pay.payment_reference }}</code></p>
+        <a class="btn lg" href="{{ url_for('orders') }}">Lihat status pesanan</a>
+      </div>
+
+    {% elif pay.status == 'refund' %}
+      <div class="state"><h2 class="h3">Dana dikembalikan</h2>
+        <p class="mute">{{ pay.refund_amount|rupiah }} dikembalikan pada {{ pay.refund_at|tgl }}.</p></div>
+
+    {% elif pay.status == 'terlambat' %}
+      <div class="state"><h2 class="h3">Pembayaran masuk terlambat</h2>
+        <p class="mute">Pembayaran diterima setelah pesanan kedaluwarsa. Admin akan meninjau dan menghubungimu.</p></div>
+
+    {% elif pay.status in ('kedaluwarsa','gagal','dibatalkan') %}
+      <div class="state bad result">
+        <div class="burst"><div class="cross">✕</div></div>
+        <h2 class="h2">Pembayaran gagal</h2>
+        <p class="mute">
+          {% if pay.status == 'kedaluwarsa' %}Waktu pembayaran habis sebelum pembayaran masuk (QRIS kedaluwarsa).
+          {% elif pay.status == 'gagal' %}Pembayaran ditolak atau dibatalkan oleh sistem pembayaran.
+          {% else %}Pesanan ini dibatalkan.{% endif %}
+        </p>
+        <p class="mute small">Tidak ada uang yang terpotong. Stok sudah dikembalikan, silakan pesan ulang.</p>
+        <a class="btn lg" href="{{ url_for('products') }}">Pesan ulang</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <aside class="summary">
+    <h2 class="h3">Rincian</h2>
+    <ul class="lines">
+      {% for it in items %}<li><span>{{ it.nama }} <span class="mute">× {{ it.jumlah }}</span></span><span>{{ it.subtotal|rupiah }}</span></li>{% endfor %}
+    </ul>
+    <div class="sum-row"><span>Total</span><strong>{{ o.total|rupiah }}</strong></div>
+    <ol class="mini-steps">
+      {% if pay.gateway %}
+      <li class="done">Scan QRIS (nominal terisi otomatis)</li>
+      <li class="{{ 'done' if pay.status == 'lunas' }}">Pembayaran terdeteksi otomatis</li>
+      <li class="{{ 'done' if pay.status == 'lunas' }}">Berhasil, pesanan diproses</li>
+      {% else %}
+      <li class="{{ 'done' if pay.status != 'belum_bayar' }}">Scan QRIS dan bayar</li>
+      <li class="{{ 'done' if pay.status in ('menunggu_verifikasi','lunas') }}">Tekan “Saya sudah bayar”</li>
+      <li class="{{ 'done' if pay.status == 'lunas' }}">Admin memverifikasi</li>
+      {% endif %}
+    </ol>
+  </aside>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+{% endblock %}

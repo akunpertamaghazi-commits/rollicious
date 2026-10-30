@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Login admin{% endblock %}
+{% block body_class %}no-nav{% endblock %}
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="auth">
+  {% set quote = 'Area pengelola toko: produk, pesanan, pembayaran, dan kas.' %}
+  {% include 'auth/_visual.html' %}
+  <div class="auth-panel">
+    <form method="post" class="auth-form" novalidate>
+      <h1>Login admin</h1>
+      <p class="mute">Akun bawaan: <code>admin</code> / <code>admin123</code>. Segera ganti sebelum dipresentasikan.</p>
+      <label class="field"><span>Username</span>
+        <input type="text" name="username" required autofocus autocomplete="username"></label>
+      <label class="field"><span>Password</span>
+        <div class="pw"><input type="password" name="password" required autocomplete="current-password">
+          <button type="button" class="pw-toggle" aria-label="Tampilkan password">tampil</button></div></label>
+      <button class="btn block" type="submit">Masuk ke dashboard</button>
+      <p class="mute center small"><a href="{{ url_for('home') }}">Kembali ke toko</a></p>
+    </form>
+  </div>
+</section>
+{% endblock %}

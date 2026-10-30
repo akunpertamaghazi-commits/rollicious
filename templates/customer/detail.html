@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import art, card %}
+{% block title %}{{ p.nama }}{% endblock %}
+{% block content %}
+{% set sold = p.stok > 0 and p.harga > 0 %}
+<section class="wrap detail">
+  <div class="detail-stage" id="stage">{{ art(p, 'big') }}</div>
+  <div class="detail-info fl-{{ p.nama|flavor }}">
+    <a class="crumb" href="{{ url_for('products') }}">‹ Semua produk</a>
+    <h1 class="h1">{{ p.nama }}</h1>
+    <p class="price big {{ 'soon' if p.harga <= 0 }}">{{ p.harga|harga }}</p>
+    <p class="desc">{{ p.deskripsi or 'Belum ada deskripsi.' }}</p>
+    <p class="stock {{ 'low' if p.stok <= 5 }}">{% if p.stok > 0 %}Stok tersedia: {{ p.stok }}{% else %}Stok habis{% endif %}</p>
+
+    {% if sold %}
+    <div class="buy">
+      <div class="qty" data-max="{{ p.stok }}">
+        <button type="button" data-q="-1" aria-label="Kurangi">−</button>
+        <input type="number" id="qty" value="1" min="1" max="{{ p.stok }}" aria-label="Jumlah">
+        <button type="button" data-q="1" aria-label="Tambah">+</button>
+      </div>
+      <button class="btn lg add-cart" data-id="{{ p.id }}" data-qty-from="#qty">Tambah ke keranjang</button>
+      <button class="btn lg ghost add-cart" data-id="{{ p.id }}" data-qty-from="#qty" data-go="{{ url_for('checkout') }}">Beli sekarang</button>
+    </div>
+    {% elif p.harga <= 0 %}
+    <p class="notice soon">Harga belum ditentukan, jadi produk ini belum bisa dipesan.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="rail-section">
+  <div class="wrap"><h2 class="h2">Rasa lainnya</h2></div>
+  <div class="rail">{% for r in related %}{{ card(r) }}{% endfor %}</div>
+</section>
+{% endblock %}

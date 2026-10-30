@@ -1,0 +1,29 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Laporan{% endblock %}
+{% block page_title %}Laporan bulanan{% endblock %}
+{% block page_actions %}
+<form method="get" class="inline-form no-print">
+  <input type="month" name="bulan" value="{{ bulan }}" aria-label="Pilih bulan" onchange="this.form.submit()">
+  <button type="button" class="btn ghost" onclick="window.print()">Cetak / simpan PDF</button>
+</form>
+{% endblock %}
+{% block admin_content %}
+<div class="stat-grid">
+  <div class="stat"><span>Penjualan lunas</span><strong>{{ rep.penjualan|rupiah }}</strong></div>
+  <div class="stat"><span>Jumlah transaksi</span><strong>{{ rep.transaksi }}</strong></div>
+  <div class="stat"><span>Kas masuk</span><strong class="good">{{ rep.masuk|rupiah }}</strong></div>
+  <div class="stat"><span>Kas keluar</span><strong class="bad">{{ rep.keluar|rupiah }}</strong></div>
+  <div class="stat"><span>Selisih kas</span><strong>{{ rep.laba|rupiah }}</strong></div>
+  <div class="stat"><span>Pesanan dibatalkan</span><strong>{{ rep.batal }}</strong></div>
+</div>
+<div class="two-col">
+  <div class="panel"><h2 class="h3">Produk terlaris</h2>
+    <div class="table-wrap"><table><thead><tr><th>Produk</th><th>Terjual</th><th>Omzet</th></tr></thead>
+    <tbody>{% for t in top %}<tr><td>{{ t.nama }}</td><td>{{ t.qty }}</td><td>{{ t.omzet|rupiah }}</td></tr>
+    {% else %}<tr><td colspan="3" class="mute">Belum ada penjualan bulan ini.</td></tr>{% endfor %}</tbody></table></div></div>
+  <div class="panel"><h2 class="h3">Penjualan harian</h2>
+    <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Transaksi</th><th>Total</th></tr></thead>
+    <tbody>{% for h in harian %}<tr><td>{{ h.tgl }}</td><td>{{ h.n }}</td><td>{{ h.total|rupiah }}</td></tr>
+    {% else %}<tr><td colspan="3" class="mute">Belum ada transaksi lunas bulan ini.</td></tr>{% endfor %}</tbody></table></div></div>
+</div>
+{% endblock %}

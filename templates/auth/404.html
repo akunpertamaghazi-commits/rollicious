@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Tidak ditemukan{% endblock %}
+{% block content %}
+<section class="wrap empty-state">
+  <h1 class="display">404</h1>
+  <p class="mute">Halaman yang kamu cari tidak ada atau sudah dipindahkan.</p>
+  <a class="btn" href="{{ url_for('home') }}">Kembali ke beranda</a>
+</section>
+{% endblock %}

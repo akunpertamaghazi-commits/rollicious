@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div class="adm">
+  <aside class="adm-side">
+    <a class="brand" href="{{ url_for('admin_dashboard') }}"><span class="brand-dot"></span>rollicios <small>admin</small></a>
+    <nav aria-label="Menu admin">
+      {% set menu = [('admin_dashboard','Dashboard'),('admin_products','Produk & stok'),('admin_orders','Pesanan'),('admin_payments','Pembayaran'),('admin_customers','Pelanggan'),('admin_cashflow','Kas'),('admin_reports','Laporan'),('admin_analytics','Analitik'),('admin_audit','Audit log'),('admin_account','Akun admin')] %}
+      {% for ep, label in menu %}
+        <a href="{{ url_for(ep) }}" class="{{ 'on' if request.endpoint == ep }}">{{ label }}</a>
+      {% endfor %}
+    </nav>
+    <div class="adm-foot">
+      <p class="mute small">Masuk sebagai {{ admin_name }}</p>
+      <button class="btn sm ghost" id="themeBtn" type="button">Ganti tema</button>
+      <a class="btn sm ghost" href="{{ url_for('home') }}" target="_blank" rel="noopener">Buka toko</a>
+      <a class="btn sm" href="{{ url_for('admin_logout') }}">Keluar</a>
+    </div>
+  </aside>
+  <section class="adm-main">
+    <header class="adm-top"><h1 class="h1">{% block page_title %}{% endblock %}</h1>{% block page_actions %}{% endblock %}</header>
+    {% block admin_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

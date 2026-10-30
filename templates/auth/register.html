@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Daftar{% endblock %}
+{% block body_class %}no-nav{% endblock %}
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="auth">
+  {% set quote = 'Buat akun dalam setengah menit. Tidak perlu email.' %}
+  {% include 'auth/_visual.html' %}
+  <div class="auth-panel">
+    <form method="post" class="auth-form" novalidate>
+      <h1>Buat akun</h1>
+      <p class="mute">Cukup nama, nomor telepon, dan password.</p>
+      <label class="field"><span>Nama lengkap</span>
+        <input type="text" name="nama" placeholder="Nama kamu" required autofocus autocomplete="name"></label>
+      <label class="field"><span>Nomor telepon</span>
+        <input type="tel" name="no_telepon" inputmode="numeric" placeholder="08123456789" required autocomplete="tel"></label>
+      <div class="two">
+        <label class="field"><span>Password</span>
+          <input type="password" name="password" placeholder="Min. 6 karakter" required autocomplete="new-password"></label>
+        <label class="field"><span>Ulangi password</span>
+          <input type="password" name="konfirmasi" placeholder="Ketik ulang" required autocomplete="new-password"></label>
+      </div>
+      <details class="more">
+        <summary>Tambahkan sosial media <span class="mute small">(opsional)</span></summary>
+        <div class="two">
+          <label class="field"><span>Instagram</span><input type="text" name="instagram" placeholder="username" maxlength="31"></label>
+          <label class="field"><span>TikTok</span><input type="text" name="tiktok" placeholder="username" maxlength="31"></label>
+        </div>
+        <label class="field"><span>Jumlah pengikut (perkiraan)</span><input type="number" name="pengikut" min="0" placeholder="0"></label>
+      </details>
+      <button class="btn block" type="submit">Buat akun</button>
+      <p class="mute center">Sudah punya akun? <a href="{{ url_for('login') }}">Masuk</a></p>
+    </form>
+  </div>
+</section>
+{% endblock %}

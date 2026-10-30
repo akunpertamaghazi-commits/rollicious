@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import card %}
+{% block title %}Produk{% endblock %}
+{% block content %}
+<section class="wrap page-head">
+  <div>
+    <h1 class="h1">Semua produk</h1>
+    <p class="mute">{{ products|length }} produk{% if q %} untuk “{{ q }}”{% endif %}</p>
+  </div>
+  <form class="filters" method="get">
+    <input type="search" name="q" value="{{ q }}" placeholder="Cari produk…" aria-label="Cari produk">
+    <select name="sort" aria-label="Urutkan" onchange="this.form.submit()">
+      <option value="baru" {{ 'selected' if sort == 'baru' }}>Terbaru</option>
+      <option value="murah" {{ 'selected' if sort == 'murah' }}>Harga terendah</option>
+      <option value="mahal" {{ 'selected' if sort == 'mahal' }}>Harga tertinggi</option>
+      <option value="nama" {{ 'selected' if sort == 'nama' }}>Nama A–Z</option>
+    </select>
+    <button class="btn" type="submit">Cari</button>
+  </form>
+</section>
+
+{% if products %}
+<section class="rail-section">
+  <div class="wrap rail-tools">
+    <div class="seg" role="group" aria-label="Tampilan">
+      <button type="button" data-view="rail" class="on">Geser</button>
+      <button type="button" data-view="grid">Grid</button>
+    </div>
+    <div class="rail-arrows" id="railArrows">
+      <button class="btn-round ghost" data-dir="-1" aria-label="Geser kiri">‹</button>
+      <button class="btn-round ghost" data-dir="1" aria-label="Geser kanan">›</button>
+    </div>
+  </div>
+  <div class="rail" id="rail">
+    {% for p in products %}{{ card(p) }}{% endfor %}
+  </div>
+</section>
+{% else %}
+<section class="wrap empty-state">
+  <p class="h2">Tidak ada produk yang cocok.</p>
+  <p class="mute">Coba kata kunci lain atau tampilkan semua produk.</p>
+  <a class="btn" href="{{ url_for('products') }}">Reset pencarian</a>
+</section>
+{% endif %}
+{% endblock %}

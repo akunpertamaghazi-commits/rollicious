@@ -1,0 +1,30 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Kas{% endblock %}
+{% block page_title %}Arus kas{% endblock %}
+{% block admin_content %}
+<div class="stat-grid three">
+  <div class="stat"><span>Kas masuk</span><strong class="good">{{ masuk|rupiah }}</strong></div>
+  <div class="stat"><span>Kas keluar</span><strong class="bad">{{ keluar|rupiah }}</strong></div>
+  <div class="stat"><span>Saldo</span><strong>{{ (masuk - keluar)|rupiah }}</strong></div>
+</div>
+<div class="two-col wide-left">
+  <div class="panel">
+    <h2 class="h3">Riwayat</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Waktu</th><th>Tipe</th><th>Keterangan</th><th>Jumlah</th><th></th></tr></thead>
+      <tbody>{% for r in rows %}
+        <tr><td>{{ r.created_at|tgl }}</td><td><span class="pill {{ 's-lunas' if r.tipe == 'masuk' else 's-dibatalkan' }}">{{ r.tipe }}</span></td>
+        <td>{{ r.keterangan }}</td><td class="{{ 'good' if r.tipe == 'masuk' else 'bad' }}">{{ '+' if r.tipe == 'masuk' else '−' }}{{ r.jumlah|rupiah }}</td>
+        <td>{% if not r.keterangan.startswith('Pembayaran pesanan #') %}<form method="post" action="{{ url_for('admin_cash_delete', cid=r.id) }}" onsubmit="return confirm('Hapus catatan ini?')"><button class="btn sm ghost">Hapus</button></form>{% endif %}</td></tr>
+      {% else %}<tr><td colspan="5" class="mute">Belum ada catatan. Pembayaran lunas akan tercatat otomatis.</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div>
+  <form class="panel" method="post">
+    <h2 class="h3">Catat manual</h2>
+    <label class="field"><span>Tipe</span><select name="tipe"><option value="keluar">Kas keluar</option><option value="masuk">Kas masuk</option></select></label>
+    <label class="field"><span>Jumlah (Rp)</span><input type="number" name="jumlah" min="1" required></label>
+    <label class="field"><span>Keterangan</span><input name="keterangan" placeholder="Contoh: Beli packing" required></label>
+    <button class="btn block" type="submit">Simpan catatan</button>
+  </form>
+</div>
+{% endblock %}

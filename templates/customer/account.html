@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Profil saya{% endblock %}
+{% block content %}
+<section class="wrap page-head"><h1 class="h1">Profil saya</h1></section>
+<section class="wrap cart-grid">
+  <form method="post" class="panel">
+    <h2 class="h3">Data diri</h2>
+    <label class="field"><span>Nama lengkap</span><input name="nama" value="{{ user.nama }}" required minlength="2"></label>
+    <label class="field"><span>Nomor telepon</span><input value="{{ user.no_telepon }}" disabled></label>
+    <label class="field"><span>Alamat pengiriman utama</span><textarea name="alamat" rows="3" maxlength="300" placeholder="Nama jalan, nomor, kota, kode pos">{{ user.alamat or '' }}</textarea></label>
+    <h2 class="h3">Sosial media <span class="mute small">(opsional)</span></h2>
+    <div class="two">
+      <label class="field"><span>Instagram</span><input name="instagram" value="{{ user.instagram or '' }}" placeholder="username" maxlength="31"></label>
+      <label class="field"><span>TikTok</span><input name="tiktok" value="{{ user.tiktok or '' }}" placeholder="username" maxlength="31"></label>
+    </div>
+    <label class="field"><span>Jumlah pengikut (perkiraan)</span><input type="number" name="pengikut" min="0" value="{{ user.pengikut or 0 }}"></label>
+    <button class="btn" type="submit">Simpan profil</button>
+  </form>
+  <aside class="summary">
+    <h2 class="h3">Kenapa diisi?</h2>
+    <p class="mute">Alamat mempercepat checkout. Data sosmed membantu toko mengenali pelanggan yang aktif membagikan produk, dan hanya dilihat oleh admin.</p>
+    <a class="btn ghost block" href="{{ url_for('orders') }}">Lihat pesanan</a>
+  </aside>
+</section>
+{% endblock %}

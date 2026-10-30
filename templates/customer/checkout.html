@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<section class="wrap page-head"><h1 class="h1">Checkout</h1></section>
+<section class="wrap cart-grid">
+  <div class="stack">
+    <div class="panel">
+      <h2 class="h3">Data pemesan</h2>
+      <dl class="kv">
+        <div><dt>Nama</dt><dd>{{ user.nama }}</dd></div>
+        <div><dt>No. telepon</dt><dd>{{ user.no_telepon }}</dd></div>
+      </dl>
+    </div>
+    <div class="panel">
+      <h2 class="h3">Pesanan</h2>
+      <ul class="lines">
+        {% for it in items %}
+        <li><span>{{ it.p.nama }} <span class="mute">× {{ it.qty }}</span></span><strong>{{ it.subtotal|rupiah }}</strong></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="panel">
+      <h2 class="h3">Metode pembayaran</h2>
+      <label class="method on"><input type="radio" checked name="m" value="qris"><span><b>QRIS</b><small class="mute">Scan dari m-banking atau e-wallet apa pun</small></span></label>
+    </div>
+  </div>
+  <aside class="summary">
+    <h2 class="h3">Total bayar</h2>
+    <p class="price big">{{ total|rupiah }}</p>
+    <form method="post" class="stack">
+      <label class="field"><span>Alamat pengiriman</span>
+        <textarea name="alamat" rows="3" required minlength="8" maxlength="300" placeholder="Nama jalan, nomor, kota, kode pos">{{ alamat }}</textarea></label>
+      <button class="btn lg block" type="submit">Buat pesanan dan bayar</button>
+    </form>
+    <a class="btn ghost block" href="{{ url_for('cart') }}">Kembali ke keranjang</a>
+  </aside>
+</section>
+{% endblock %}

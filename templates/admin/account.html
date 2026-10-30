@@ -1,0 +1,13 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Akun admin{% endblock %}
+{% block page_title %}Akun admin{% endblock %}
+{% block admin_content %}
+<form method="post" class="panel" style="max-width:460px">
+  <h2 class="h3">Ganti password</h2>
+  <p class="mute small">Masuk sebagai <b>{{ a.username }}</b>. Gunakan password unik minimal 8 karakter.</p>
+  <label class="field"><span>Password lama</span><input type="password" name="lama" required autocomplete="current-password"></label>
+  <label class="field"><span>Password baru</span><input type="password" name="baru" required minlength="8" autocomplete="new-password"></label>
+  <label class="field"><span>Ulangi password baru</span><input type="password" name="konfirmasi" required minlength="8" autocomplete="new-password"></label>
+  <button class="btn" type="submit">Simpan password</button>
+</form>
+{% endblock %}

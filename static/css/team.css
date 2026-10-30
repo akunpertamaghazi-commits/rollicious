@@ -1,0 +1,117 @@
+/* ==========================================================================
+   HALAMAN TIM — lima tema (satu per anggota), masing-masing punya latar & animasi sendiri
+   ========================================================================== */
+
+
+/* ---------- indeks tim ---------- */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; padding-bottom: 80px; }
+.tcard { position: relative; display: grid; gap: 8px; align-content: end; min-height: 320px; padding: 22px; border-radius: var(--r-lg); overflow: hidden; color: #fff; text-decoration: none; isolation: isolate; box-shadow: var(--shadow); transition: transform .3s, box-shadow .3s; }
+.tcard:hover { text-decoration: none; box-shadow: 0 30px 60px -24px var(--c1); }
+.tcard.t-mayo { background: linear-gradient(160deg, #ffe27a, #ffb300); color: #3a2a05; }
+.tcard.t-keju { background: linear-gradient(160deg, #ffb02e, #e8590c); color: #3a1500; }
+.tcard.t-coklat { background: linear-gradient(160deg, #6b3a22, #2a140a); }
+.tcard.t-matcha { background: linear-gradient(160deg, #b8e063, #3f7d1a); color: #12290a; }
+.tcard.t-galaksi { background: radial-gradient(120% 90% at 30% 0%, #5b2bb5, #0d0a26 70%); }
+.tcard-no { position: absolute; top: 16px; right: 18px; font-family: var(--display); font-size: 2.4rem; opacity: .28; }
+.tcard-avatar { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%; font-family: var(--display); font-size: 1.4rem; background: rgba(255,255,255,.28); border: 2px solid rgba(255,255,255,.6); backdrop-filter: blur(6px); margin-bottom: 8px; }
+.tcard-name { font-family: var(--display); font-size: 1.05rem; line-height: 1.2; }
+.tcard-role { font-size: .85rem; opacity: .85; }
+.tcard-go { margin-top: 8px; font-weight: 700; font-size: .88rem; transition: letter-spacing .25s; } .tcard:hover .tcard-go { letter-spacing: .04em; }
+.tcard-fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.tcard-fx i { position: absolute; border-radius: 50%; background: rgba(255,255,255,.35); animation: tcfloat 7s ease-in-out infinite; }
+.tcard-fx i:nth-child(1) { width: 70px; height: 70px; left: -14px; top: 18%; } .tcard-fx i:nth-child(2) { width: 34px; height: 34px; right: 22%; top: 8%; animation-delay: -2s; }
+.tcard-fx i:nth-child(3) { width: 90px; height: 90px; right: -28px; top: 44%; animation-delay: -4s; } .tcard-fx i:nth-child(4) { width: 20px; height: 20px; left: 36%; top: 30%; animation-delay: -1s; }
+@keyframes tcfloat { 50% { transform: translateY(-16px) scale(1.12); } }
+
+/* ---------- halaman anggota: variabel tema menimpa warna global (navbar & footer ikut) ---------- */
+body[class*="theme-"]::before { display: none; }
+body[class*="theme-"] { transition: none; }
+body.theme-mayo   { --text: #3a2a05; --mute: #7a6420; --card: rgba(255,251,230,.86); --bg2: #fff0b8; --line: rgba(90,60,0,.16); --accent: #d98e00; --accent-ink: #fff; --accent2: #ff7a18;
+  background: linear-gradient(165deg, #fff8dc 0%, #ffe891 48%, #ffc94d 100%) fixed; }
+body.theme-keju   { --text: #3a1500; --mute: #7a3b0a; --card: rgba(255,240,210,.82); --bg2: #ffc875; --line: rgba(90,30,0,.18); --accent: #c2410c; --accent-ink: #fff; --accent2: #ff9a1f;
+  background: linear-gradient(170deg, #ffc247 0%, #ff9a1f 50%, #f06a0a 100%) fixed; }
+body.theme-coklat { --text: #fbefe0; --mute: #d0b090; --card: rgba(60,30,18,.78); --bg2: #3a1c10; --line: rgba(255,220,180,.16); --accent: #f0b060; --accent-ink: #2a140a; --accent2: #d9783a;
+  background: radial-gradient(90% 70% at 70% 0%, #5e3320 0%, #34190d 55%, #1c0d06 100%) fixed; }
+body.theme-matcha { --text: #12290a; --mute: #3f6a22; --card: rgba(244,255,222,.84); --bg2: #c7e68a; --line: rgba(20,60,0,.18); --accent: #2f7d12; --accent-ink: #fff; --accent2: #86c232;
+  background: linear-gradient(170deg, #eefad2 0%, #b4dd6a 50%, #6fae2f 100%) fixed; }
+body.theme-galaksi { --text: #f3f0ff; --mute: #b3aadf; --card: rgba(24,16,64,.72); --bg2: #170f3d; --line: rgba(160,140,255,.22); --accent: #ff4d8d; --accent-ink: #fff; --accent2: #7c8cff;
+  background: radial-gradient(100% 80% at 50% 0%, #2a1470 0%, #120a35 50%, #070418 100%) fixed; }
+
+.t-fx { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.t-fx > i { position: absolute; display: block; }
+.t-fx canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* === 1. MAYO: gelembung krim naik perlahan === */
+.bub { bottom: -120px; width: var(--s); height: var(--s); border-radius: 50%; border: 1.5px solid rgba(255,255,255,.75);
+  background: radial-gradient(circle at 30% 26%, #fff 0 10%, rgba(255,255,255,.45) 11% 38%, rgba(255,255,255,.1) 72%); animation: bubrise linear infinite; }
+@keyframes bubrise { 0% { transform: translate(0, 0) scale(.6); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(var(--dx), -60vh) scale(1); } 100% { transform: translate(calc(var(--dx) * -1), -125vh) scale(1.15); opacity: .2; } }
+
+/* === 2. KEJU: lelehan keju menetes dari atas === */
+.melt-edge { position: absolute; left: 0; right: 0; top: 0; height: 46px; background: radial-gradient(circle at 24px 0, #ffd95a 0 26px, transparent 27px) repeat-x; background-size: 52px 46px; filter: drop-shadow(0 6px 6px rgba(120,50,0,.25)); }
+.drip { top: 0; width: var(--w); height: 40px; border-radius: 0 0 var(--w) var(--w); background: linear-gradient(90deg, #ffcf3d, #ffe27a 45%, #ffbd24); box-shadow: inset -3px -6px 8px rgba(190,90,0,.25); transform-origin: top; animation: cheesedrip var(--d) cubic-bezier(.55,.1,.6,1) infinite; }
+@keyframes cheesedrip { 0% { height: 30px; transform: translateY(0); opacity: 0; } 8% { opacity: 1; } 55% { height: 210px; transform: translateY(0); } 85% { height: 60px; transform: translateY(70vh); opacity: 1; } 100% { height: 24px; transform: translateY(105vh); opacity: 0; } }
+.hole { width: var(--s); height: var(--s); border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(160,60,0,.25), rgba(255,200,80,.0) 70%); box-shadow: inset 4px 5px 10px rgba(150,60,0,.3); animation: holepulse 6s ease-in-out infinite; }
+@keyframes holepulse { 50% { transform: scale(1.14); opacity: .75; } }
+
+/* === 3. COKLAT: ombak coklat + kilau emas === */
+.wave { left: 0; bottom: 0; width: 200%; height: 190px; background-repeat: repeat-x; background-size: 50% 100%; animation: wavemove var(--d) linear infinite; opacity: var(--o); }
+.wave.w1 { --d: 16s; --o: .55; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0 60 Q150 5 300 60 T600 60 T900 60 T1200 60 V120 H0Z' fill='%23a85a2a'/%3E%3C/svg%3E"); }
+.wave.w2 { --d: 11s; --o: .7; height: 150px; animation-direction: reverse; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0 70 Q150 20 300 70 T600 70 T900 70 T1200 70 V120 H0Z' fill='%236b3a22'/%3E%3C/svg%3E"); }
+.wave.w3 { --d: 7s; --o: .95; height: 110px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0 80 Q150 40 300 80 T600 80 T900 80 T1200 80 V120 H0Z' fill='%233a1c10'/%3E%3C/svg%3E"); }
+@keyframes wavemove { to { transform: translateX(-50%); } }
+.spark { width: var(--s); height: var(--s); background: radial-gradient(circle, #ffe9b0 0 25%, rgba(255,214,140,.0) 70%); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle var(--d) ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .1; transform: scale(.5) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(90deg); } }
+
+/* === 4. MATCHA: daun melayang jatuh === */
+.leaf { left: 0; top: 0; width: var(--s); height: calc(var(--s) * 1.45); border-radius: 0 100% 0 100%; background: linear-gradient(135deg, #c5ec74, #5aa02c 70%); box-shadow: inset -3px -3px 6px rgba(20,70,0,.28); animation: leaffall var(--d) linear infinite; opacity: .9; }
+.leaf::after { content: ''; position: absolute; left: 50%; top: 10%; width: 1.5px; height: 80%; background: rgba(255,255,255,.4); transform: rotate(40deg); }
+@keyframes leaffall { 0% { transform: translate3d(var(--x0), -14vh, 0) rotate(var(--r0)); } 25% { transform: translate3d(calc(var(--x0) + 8vw), 25vh, 0) rotate(calc(var(--r0) + 150deg)); } 50% { transform: translate3d(calc(var(--x0) - 2vw), 55vh, 0) rotate(calc(var(--r0) + 290deg)); } 75% { transform: translate3d(calc(var(--x0) + 9vw), 85vh, 0) rotate(calc(var(--r0) + 420deg)); } 100% { transform: translate3d(calc(var(--x0) + 3vw), 115vh, 0) rotate(calc(var(--r0) + 540deg)); } }
+
+/* === 5. GALAKSI: bintang (canvas) + lantai grid neon === */
+.neon-grid { left: -50%; right: -50%; bottom: -8%; height: 46%; background-image: linear-gradient(rgba(255,77,141,.55) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(124,140,255,.55) 1.5px, transparent 1.5px); background-size: 64px 64px; transform: perspective(380px) rotateX(62deg); transform-origin: bottom; animation: gridrun 2.4s linear infinite; mask-image: linear-gradient(transparent, #000 60%); -webkit-mask-image: linear-gradient(transparent, #000 60%); }
+@keyframes gridrun { to { background-position: 0 64px, 0 0; } }
+.planet { right: 8vw; top: 14vh; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffb3d1, #ff4d8d 45%, #4b1a8c); box-shadow: 0 0 60px rgba(255,77,141,.55), inset -14px -12px 26px rgba(10,0,40,.6); animation: planet 9s ease-in-out infinite; }
+.planet::after { content: ''; position: absolute; left: -30%; right: -30%; top: 42%; height: 18%; border: 3px solid rgba(180,160,255,.7); border-radius: 50%; transform: rotate(-18deg); }
+@keyframes planet { 50% { transform: translateY(-18px); } }
+
+/* ---------- hero anggota ---------- */
+.member-hero { display: grid; grid-template-columns: 320px 1fr; gap: 56px; align-items: center; padding: 36px 0 30px; }
+.avatar-wrap { position: relative; width: 300px; aspect-ratio: 1; justify-self: center; transform-style: preserve-3d; }
+.avatar { position: absolute; inset: 22px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; font-family: var(--display); font-size: 4.4rem; color: #fff; background: radial-gradient(circle at 30% 26%, var(--c2), var(--c1) 55%, var(--c3)); box-shadow: 0 30px 60px -20px var(--c1), inset -16px -16px 40px rgba(0,0,0,.25); }
+.theme-mayo .avatar, .theme-matcha .avatar { color: #3a2a05; } .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, var(--c1), var(--c2), var(--c3), var(--c1)); animation: spin 8s linear infinite; mask: radial-gradient(circle, transparent 64%, #000 65%); -webkit-mask: radial-gradient(circle, transparent 64%, #000 65%); }
+.member-no { font-weight: 700; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
+.member-name { font-family: var(--display); font-size: clamp(2rem, 5vw, 3.8rem); letter-spacing: -.03em; line-height: 1.08; margin-bottom: 14px; }
+.member-name span { display: inline-block; animation: var(--na) .9s calc(var(--i) * 55ms) cubic-bezier(.2,.9,.3,1.2) both; }
+.member-role { display: inline-block; font-weight: 700; padding: 7px 16px; border-radius: 999px; background: color-mix(in srgb, var(--c1) 30%, transparent); border: 1px solid color-mix(in srgb, var(--c1) 70%, transparent); margin-bottom: 18px; }
+.member-quote { margin: 0 0 24px; max-width: 46ch; font-size: 1.15rem; color: var(--mute); font-style: italic; }
+/* animasi nama berbeda tiap tema */
+.theme-mayo { --na: namepop; } .theme-keju { --na: namedrip; } .theme-coklat { --na: nameblur; } .theme-matcha { --na: namesprout; } .theme-galaksi { --na: nameneon; }
+@keyframes namepop { 0% { opacity: 0; transform: translateY(40px) scale(.3); } 70% { transform: translateY(-10px) scale(1.15); } 100% { opacity: 1; transform: none; } }
+@keyframes namedrip { 0% { opacity: 0; transform: translateY(-70px) scaleY(1.9) scaleX(.7); } 60% { opacity: 1; transform: translateY(8px) scaleY(.85); } 100% { transform: none; } }
+@keyframes nameblur { 0% { opacity: 0; filter: blur(14px); transform: translateY(24px); letter-spacing: .4em; } 100% { opacity: 1; filter: none; transform: none; } }
+@keyframes namesprout { 0% { opacity: 0; transform: scaleY(0) rotate(-12deg); transform-origin: bottom; } 70% { transform: scaleY(1.18) rotate(4deg); transform-origin: bottom; } 100% { opacity: 1; transform: none; transform-origin: bottom; } }
+@keyframes nameneon { 0%, 18% { opacity: 0; text-shadow: none; } 22% { opacity: 1; } 28% { opacity: .2; } 34%, 100% { opacity: 1; text-shadow: 0 0 10px var(--c1), 0 0 26px var(--c1), 0 0 52px var(--c2); } }
+
+/* ---------- panel & isi ---------- */
+.member-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px 0 40px; }
+.tpanel { padding: 28px; border-radius: var(--r-lg); background: var(--card); border: 1px solid var(--line); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); display: grid; gap: 14px; align-content: start; box-shadow: var(--shadow); }
+.tpanel .h3 { padding-bottom: 12px; border-bottom: 2px solid var(--c1); display: inline-block; }
+.h4 { font-size: .95rem; margin-top: 6px; }
+.bio { margin: 0; display: grid; gap: 10px; } .bio div { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 8px; border-bottom: 1px dashed var(--line); } .bio dt { color: var(--mute); } .bio dd { margin: 0; font-weight: 700; text-align: right; }
+.tags { display: flex; gap: 8px; flex-wrap: wrap; } .tag { padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: .88rem; background: color-mix(in srgb, var(--c1) 26%, transparent); transition: transform .2s; } .tag:hover { transform: translateY(-3px) rotate(-2deg); }
+.skills { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; } .skill-head { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; }
+.skill-bar { height: 10px; border-radius: 10px; background: color-mix(in srgb, var(--text) 12%, transparent); overflow: hidden; }
+.skill-bar i { display: block; height: 100%; width: 0; border-radius: 10px; background: linear-gradient(90deg, var(--c3), var(--c1), var(--c2)); transition: width 1.4s cubic-bezier(.2,.8,.2,1); }
+.rv.in .skill-bar i, html:not(.t-js) .skill-bar i { width: var(--w); }
+.tasks { margin: 0; padding-left: 22px; display: grid; gap: 10px; } .tasks li::marker { color: var(--c1); font-weight: 800; }
+.t-js .rv { opacity: 0; transform: translateY(30px); transition: opacity .7s, transform .7s cubic-bezier(.2,.8,.2,1); } .t-js .rv.in { opacity: 1; transform: none; }
+.member-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-bottom: 70px; }
+.mn { display: grid; gap: 4px; padding: 22px 26px; border-radius: var(--r-lg); color: #fff; text-decoration: none; transition: transform .25s; box-shadow: var(--shadow); } .mn:hover { transform: translateY(-5px); text-decoration: none; } .mn:last-child { text-align: right; }
+.mn small { opacity: .8; } .mn b { font-family: var(--display); font-weight: 500; }
+.mn.t-mayo { background: linear-gradient(135deg, #f3b400, #ffd54a); color: #3a2a05; } .mn.t-keju { background: linear-gradient(135deg, #e8590c, #ffa62b); color: #fff; }
+.mn.t-coklat { background: linear-gradient(135deg, #3a1c10, #8a4a26); } .mn.t-matcha { background: linear-gradient(135deg, #3f7d1a, #8cc63f); color: #fff; } .mn.t-galaksi { background: linear-gradient(135deg, #2a1470, #ff4d8d); }
+
+@media (max-width: 900px) { .member-hero { grid-template-columns: 1fr; gap: 24px; text-align: center; } .member-quote { margin-inline: auto; } .member-hero .row-gap { justify-content: center; } .avatar-wrap { width: 240px; } .avatar { font-size: 3.4rem; } .planet { width: 70px; height: 70px; } }
+@media (max-width: 520px) { .member-nav { grid-template-columns: 1fr; } .mn:last-child { text-align: left; } }
+@media (prefers-reduced-motion: reduce) { .t-fx > i, .t-fx canvas, .wave, .neon-grid, .avatar-ring, .member-name span { animation: none !important; } .t-js .rv { opacity: 1; transform: none; } .skill-bar i { width: var(--w); } }

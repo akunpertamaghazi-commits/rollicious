@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import card, risol %}
+{% block title %}Beranda{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="blob b1" aria-hidden="true"></div><div class="blob b2" aria-hidden="true"></div><div class="blob b3" aria-hidden="true"></div>
+  <div id="hero3d" class="hero3d" aria-hidden="true">
+    <div class="hero-fallback">
+      {{ risol('mayo','loop','0s') }}{{ risol('keju','loop','-1.3s') }}{{ risol('coklat','loop','-2.6s') }}{{ risol('matcha','loop','-3.9s') }}
+    </div>
+  </div>
+  <div class="wrap hero-inner">
+    <p class="hero-note">Rollicious</p>
+    <h1 class="display hero-title">sekali coba dijamin lupa dia</h1>
+    <p class="lead">Risol renyah dengan isi yang mengalir: mayo, keju, coklat, dan matcha. Pilih rasamu.</p>
+    <div class="hero-cta">
+      <a class="btn lg" href="#koleksi">Pilih rasa</a>
+      <a class="btn lg ghost" href="{{ url_for('products') }}">Semua produk</a>
+    </div>
+    <ul class="flavor-chips" aria-label="Pilihan rasa">
+      <li class="fl-mayo"><i></i>Mayo</li><li class="fl-keju"><i></i>Keju</li><li class="fl-coklat"><i></i>Coklat</li><li class="fl-matcha"><i></i>Matcha</li>
+    </ul>
+    <dl class="hero-stats">
+      <div><dt>Pelanggan</dt><dd data-count="{{ stats.pelanggan }}">{{ stats.pelanggan }}</dd></div>
+      <div><dt>Pesanan selesai dibayar</dt><dd data-count="{{ stats.pesanan }}">{{ stats.pesanan }}</dd></div>
+      <div><dt>Pilihan rasa</dt><dd data-count="{{ stats.produk }}">{{ stats.produk }}</dd></div>
+    </dl>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">scroll</div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {% for _ in range(4) %}
+    <span class="m-mayo">Mayo</span><span class="m-keju">Keju</span><span class="m-coklat">Coklat</span><span class="m-matcha">Matcha</span>
+    {% endfor %}
+  </div>
+</div>
+
+<section class="hscroll" id="koleksi">
+  <div class="hs-sticky">
+    <div class="wrap hs-head">
+      <div>
+        <h2 class="h2">Empat rasa lumer</h2>
+        <p class="mute">Gulir ke bawah, rak rasa akan bergeser ke samping. Arahkan kursor ke risol untuk membelahnya.</p>
+      </div>
+      <div class="hs-progress"><span id="hsBar"></span></div>
+    </div>
+    <div class="hs-track" id="hsTrack">
+      {% for p in products %}{{ card(p) }}{% endfor %}
+      <a class="pcard see-all" href="{{ url_for('products') }}"><span>Lihat semua produk</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="wrap section">
+  <h2 class="h2">Pesan dalam empat langkah</h2>
+  <ol class="steps">
+    <li><b>1</b><h3>Pilih rasa</h3><p>Telusuri produk, cari berdasarkan nama, atau urutkan sesuai kebutuhanmu.</p></li>
+    <li><b>2</b><h3>Checkout</h3><p>Periksa isi keranjang lalu buat pesanan. Stok langsung diamankan untukmu.</p></li>
+    <li><b>3</b><h3>Scan QRIS</h3><p>Bayar dari aplikasi bank atau dompet digital, lalu tekan “Saya sudah bayar”.</p></li>
+    <li><b>4</b><h3>Admin verifikasi</h3><p>Setelah pembayaran dicek, status berubah menjadi lunas dan pesanan diproses.</p></li>
+  </ol>
+</section>
+
+<section class="wrap section">
+  <div class="cta-band" data-tilt>
+    <div>
+      <h2 class="h2">Belum punya akun?</h2>
+      <p class="mute">Daftar pakai nomor telepon dan mulai memesan.</p>
+    </div>
+    {% if cur_user %}
+      <a class="btn lg" href="{{ url_for('orders') }}">Lihat pesananmu</a>
+    {% else %}
+      <a class="btn lg" href="{{ url_for('register') }}">Buat akun</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{{ url_for('static', filename='js/hero3d.js') }}"></script>
+{% endblock %}

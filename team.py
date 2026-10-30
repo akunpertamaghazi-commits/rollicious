@@ -1,0 +1,60 @@
+"""Data anggota kelompok (5 orang). EDIT FILE INI untuk mengisi nama & biodata asli.
+
+Cara mengisi:
+  * nama, nim, prodi, kampus, kelas, kota, tentang, kutipan, tugas, keahlian, hobi, instagram, email
+  * slug   : bagian alamat halaman, mis. "budi" -> /tim/budi  (huruf kecil, tanpa spasi)
+  * tema   : mayo | keju | coklat | matcha | galaksi  (menentukan warna latar + animasi halaman)
+  * foto   : simpan gambar di static/images/team/<slug>.jpg (atau .png/.webp). Jika tidak ada, tampil inisial.
+  * keahlian: daftar (nama, nilai 0-100)
+Simpan file lalu jalankan ulang aplikasi.
+"""
+import os
+
+TEAM = [
+    dict(slug="fahri dwi hariyanto", tema="mayo", nama="Fahri Dwi Hariyanto", peran="Ketua Kelompok & Koordinator",
+         nim="19261516", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="rajn sholat kayanya mah",
+         tugas=["Mengoordinasi jadwal dan pembagian tugas kelompok", "Menyusun laporan akhir dan presentasi"],
+         keahlian=[("Kepemimpinan", 90), ("Komunikasi", 85), ("Manajemen waktu", 80)],
+         hobi=["Mobile legends", "ngegame", "ngopi"], kutipan="jangan lupa ngopi.",
+         instagram="@azuureami", email="-"),
+    dict(slug="keyla ainurista", tema="keju", nama="Keyla Ainurista", peran="produksi",
+         nim="19261656", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="ramah ke semua orang (katanya)",
+         tugas=["singkat"],
+         keahlian=[("adaptasi", 88), ("masak", 82), ("penghitungan", 78)],
+         hobi=["Tidur, Makan, Nonton Kpop"], kutipan="-",
+         instagram="@kylaainurista", email="-"),
+    dict(slug="m.faizal afandi", tema="coklat", nama="Muhammad Faizal Afandi", peran="marketing & promosi",
+         nim="19262109", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="Tulis perkenalan singkat tentang ",
+         tugas=["peomosi produk dengan media sosial"],
+         keahlian=[("editing", 92), ("creator", 84), ("promosi", 88)],
+         hobi=["berenang, ngerokok, ngopi"], kutipan="-",
+         instagram="@faisalafndii", email="-"),
+    dict(slug="rayhan saputra", tema="matcha", nama="Rayhan Saputra", peran="Keuangan & Administrasi",
+         nim="19261395", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="pendaki kalcer.",
+         tugas=["Menentukan harga jual dan menghitung modal", "Mencatat kas masuk dan keluar", "Menyusun laporan keuangan"],
+         keahlian=[("Akuntansi dasar", 86), ("Excel", 90), ("Ketelitian", 94)],
+         hobi=["tracking, ngedaki, travelling"], kutipan="gatau ah males mau beli truk.",
+         instagram="@rayhann908", email=""),
+    dict(slug="Ahmad Ghazi Al-ghifary", tema="galaksi", nama="Ahmad Ghazi Al-ghifary", peran="Developer & oprasional",
+         nim="19261504", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="perkenalkan saya ahmad ghazi al-ghifary, saya adalah seorang mahasiswa sistem informasi di universitas bina sarana informatika. saya meiliki minat bakat dalam sebuah pengembangan teknologi",
+         tugas=["Membuat konten dan jadwal posting", "Mengelola akun sosial media toko", "Merancang promo dan kemasan"],
+         keahlian=[("HTML & CSS", 100), ("Python & Flask", 100), ("Basis data", 100)],
+         hobi=["futsal, game, tidur"], kutipan="kalau berak sekebon cebok nya selaut",
+         instagram="@ahmdghzee", email="ghazialghifary12@Gmail.com"),
+]
+
+_EXT = ("jpg", "jpeg", "png", "webp")
+
+
+def photo_for(slug, static_dir):
+    """Nama file foto di static/images/team/ jika ada, selain itu None."""
+    for ext in _EXT:
+        name = f"{slug}.{ext}"
+        if os.path.exists(os.path.join(static_dir, "images", "team", name)):
+            return name
+    return None

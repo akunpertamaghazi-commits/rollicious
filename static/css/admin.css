@@ -1,0 +1,48 @@
+/* Panel admin — memakai variabel warna dari style.css */
+.admin-body main { padding-top: 0; min-height: 100vh; }
+.adm { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+.adm-side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 28px; padding: 26px 18px; border-right: 1px solid var(--line); background: var(--bg2); }
+.adm-side nav { display: grid; gap: 4px; }
+.adm-side nav a { color: var(--mute); padding: 11px 14px; border-radius: 12px; font-weight: 600; font-size: .94rem; transition: background .2s, color .2s, padding .2s; }
+.adm-side nav a:hover { color: var(--text); background: var(--card); text-decoration: none; padding-left: 20px; }
+.adm-side nav a.on { color: var(--accent-ink); background: var(--accent); }
+.adm-foot { margin-top: auto; display: grid; gap: 8px; }
+.adm-main { padding: 34px clamp(18px, 3vw, 44px) 70px; display: grid; gap: 22px; align-content: start; min-width: 0; }
+.adm-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; } .stat-grid.three { grid-template-columns: repeat(3, 1fr); }
+.stat { display: grid; gap: 8px; padding: 22px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--line); color: var(--text); transition: transform .2s, border-color .2s; }
+.stat span { color: var(--mute); font-size: .85rem; font-weight: 600; } .stat strong { font-family: var(--display); font-size: 1.35rem; font-weight: 500; letter-spacing: -.02em; }
+.stat.link:hover { transform: translateY(-3px); border-color: var(--accent); text-decoration: none; }
+.stat.alert { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card)); }
+.two-col { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; } .two-col.wide-left { grid-template-columns: 1.8fr 1fr; }
+
+.bars { display: flex; align-items: end; gap: 14px; height: 200px; padding-top: 10px; }
+.bar { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: end; align-items: center; gap: 6px; }
+.bar i { display: block; width: 100%; min-height: 3px; border-radius: 10px 10px 4px 4px; background: linear-gradient(var(--accent), color-mix(in srgb, var(--accent) 35%, transparent)); transform-origin: bottom; animation: grow .8s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes grow { from { transform: scaleY(0); } }
+.bar-val { font-size: .72rem; color: var(--mute); } .bar-lbl { font-size: .75rem; color: var(--mute); }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; color: var(--mute); font-weight: 600; font-size: .8rem; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: middle; } tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); } tr:last-child td { border-bottom: 0; }
+.thumb-cell { width: 64px; } .thumb-cell .mini { width: 48px; }
+.inline-form { display: inline-flex; gap: 8px; align-items: center; } .inline-form input { padding: 8px 10px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chips a { padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); color: var(--mute); font-size: .85rem; font-weight: 600; } .chips a:hover { text-decoration: none; color: var(--text); border-color: var(--accent); } .chips a.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.dialog { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--card); color: var(--text); padding: 0; width: min(520px, 92vw); box-shadow: var(--shadow); }
+.dialog::backdrop { background: rgba(5,7,12,.65); backdrop-filter: blur(4px); }
+.dialog[open] { animation: slidein .3s; } .dialog-form { display: grid; gap: 14px; padding: 28px; }
+textarea { resize: vertical; }
+
+@media (max-width: 900px) {
+  .adm { grid-template-columns: 1fr; } .adm-side { position: static; height: auto; flex-direction: column; } .adm-side nav { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+  .two-col, .two-col.wide-left, .stat-grid.three { grid-template-columns: 1fr; }
+}
+@media print {
+  .adm-side, .no-print, .toasts { display: none !important; } .adm { display: block; }
+  :root, [data-theme] { --bg: #fff; --card: #fff; --bg2: #fff; --text: #000; --mute: #444; --line: #ccc; }
+  body { background: #fff; color: #000; } .panel, .stat { break-inside: avoid; box-shadow: none; }
+}

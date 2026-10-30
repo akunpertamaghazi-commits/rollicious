@@ -1,0 +1,49 @@
+{# ===== Ilustrasi risol SVG yang bisa terbelah & isinya lumer keluar (warna ikut rasa) ===== #}
+{% macro risol(fl='keju', cls='', delay='0s') -%}
+<svg class="risol fl-{{ fl }} {{ cls }}" viewBox="0 0 200 220" style="animation-delay: {{ delay }}" role="img" aria-label="Risol lumer rasa {{ fl }}">
+  <ellipse class="shadow" cx="100" cy="208" rx="48" ry="7"/>
+  <g transform="rotate(-24 100 110)">
+    <path class="stretch" d="M72 60 L128 60 C128 90 112 98 112 110 C112 122 128 130 128 160 L72 160 C72 130 88 122 88 110 C88 98 72 90 72 60 Z"/>
+    <g class="half top">
+      <path class="crust" d="M68 110 V67 A32 32 0 0 1 132 67 V110 Z"/>
+      <path fill="url(#crumb)" d="M68 110 V67 A32 32 0 0 1 132 67 V110 Z"/>
+      <path class="shine" d="M77 104 V70 A24 24 0 0 1 89 48"/>
+      <ellipse class="cut" cx="100" cy="109" rx="27" ry="5"/>
+    </g>
+    <g class="half bot">
+      <path class="crust" d="M68 110 V153 A32 32 0 0 0 132 153 V110 Z"/>
+      <path fill="url(#crumb)" d="M68 110 V153 A32 32 0 0 0 132 153 V110 Z"/>
+      <path class="shine" d="M77 118 V150"/>
+      <ellipse class="cut" cx="100" cy="111" rx="27" ry="6"/>
+      <circle class="drip" cx="88" cy="118" r="3.6" style="animation-delay:-.4s"/>
+      <circle class="drip" cx="104" cy="118" r="3" style="animation-delay:-1.1s"/>
+      <circle class="drip" cx="116" cy="118" r="2.6" style="animation-delay:-1.6s"/>
+    </g>
+  </g>
+</svg>
+{%- endmacro %}
+
+{# Visual produk: pakai foto jika ada, kalau tidak pakai ilustrasi risol sesuai rasa #}
+{% macro art(p, cls='') -%}
+{% set fl = p.nama|flavor %}
+<div class="art fl-{{ fl }} {{ cls }}">
+{% if p.gambar %}<img src="{{ url_for('static', filename='images/products/' + p.gambar) }}" alt="{{ p.nama }}" loading="lazy">
+{% else %}{{ risol(fl, 'loop' if 'big' in cls else '') }}{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro card(p) -%}
+{% set fl = p.nama|flavor %}
+{% set sold = p.stok > 0 and p.harga > 0 %}
+<article class="pcard fl-{{ fl }}" data-tilt>
+  <a href="{{ url_for('product_detail', pid=p.id) }}" class="pcard-art" aria-label="Lihat {{ p.nama }}">{{ art(p) }}</a>
+  <div class="pcard-body">
+    <h3><a href="{{ url_for('product_detail', pid=p.id) }}">{{ p.nama }}</a></h3>
+    <p class="price {{ 'soon' if p.harga <= 0 }}">{{ p.harga|harga }}</p>
+    <div class="pcard-foot">
+      <span class="stock {{ 'low' if p.stok <= 5 }}">{% if p.stok > 0 %}Stok {{ p.stok }}{% else %}Habis{% endif %}</span>
+      <button class="btn-round add-cart" data-id="{{ p.id }}" {% if not sold %}disabled{% endif %} aria-label="Tambah {{ p.nama }} ke keranjang">+</button>
+    </div>
+  </div>
+</article>
+{%- endmacro %}

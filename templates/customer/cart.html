@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import art %}
+{% block title %}Keranjang{% endblock %}
+{% block content %}
+<section class="wrap page-head"><h1 class="h1">Keranjang</h1></section>
+{% if items %}
+<section class="wrap cart-grid">
+  <div class="cart-list" id="cartList">
+    {% for it in items %}
+    <article class="cart-row" data-id="{{ it.p.id }}">
+      <a href="{{ url_for('product_detail', pid=it.p.id) }}" class="thumb">{{ art(it.p) }}</a>
+      <div class="cart-info">
+        <h3>{{ it.p.nama }}</h3>
+        <p class="mute">{{ it.p.harga|rupiah }} / item</p>
+      </div>
+      <div class="qty" data-max="{{ it.p.stok }}">
+        <button type="button" data-cq="-1" aria-label="Kurangi">−</button>
+        <input type="number" value="{{ it.qty }}" min="1" max="{{ it.p.stok }}" aria-label="Jumlah {{ it.p.nama }}">
+        <button type="button" data-cq="1" aria-label="Tambah">+</button>
+      </div>
+      <strong class="line-total">{{ it.subtotal|rupiah }}</strong>
+      <button class="btn-round ghost rm" aria-label="Hapus {{ it.p.nama }}">×</button>
+    </article>
+    {% endfor %}
+  </div>
+  <aside class="summary">
+    <h2 class="h3">Ringkasan</h2>
+    <div class="sum-row"><span>Subtotal</span><strong id="cartTotal">{{ total|rupiah }}</strong></div>
+    <div class="sum-row mute"><span>Ongkir</span><span>Diatur penjual</span></div>
+    <a class="btn lg block" href="{{ url_for('checkout') }}">Lanjut ke checkout</a>
+    <a class="btn ghost block" href="{{ url_for('products') }}">Tambah produk lain</a>
+  </aside>
+</section>
+{% else %}
+<section class="wrap empty-state">
+  <p class="h2">Keranjangmu masih kosong.</p>
+  <p class="mute">Temukan produk yang kamu suka lalu tekan tombol +.</p>
+  <a class="btn" href="{{ url_for('products') }}">Jelajahi produk</a>
+</section>
+{% endif %}
+{% endblock %}

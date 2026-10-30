@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Terjadi kesalahan{% endblock %}
+{% block content %}
+<section class="wrap empty-state">
+  <h1 class="display">Oops</h1>
+  <p class="mute">Terjadi kesalahan di server. Datamu aman, silakan coba lagi sebentar.</p>
+  <a class="btn" href="{{ url_for('home') }}">Kembali ke beranda</a>
+</section>
+{% endblock %}

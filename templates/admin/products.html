@@ -1,0 +1,71 @@
+{% extends 'admin/layout.html' %}
+{% from '_macros.html' import art %}
+{% block title %}Produk & stok{% endblock %}
+{% block page_title %}Produk & stok{% endblock %}
+{% block page_actions %}<button class="btn" id="newProduct" type="button">Tambah produk</button>{% endblock %}
+{% block admin_content %}
+<div class="panel">
+  <div class="table-wrap"><table>
+    <thead><tr><th></th><th>Produk</th><th>Harga</th><th>Stok</th><th>Atur stok</th><th></th></tr></thead>
+    <tbody>
+    {% for p in products %}
+      <tr>
+        <td class="thumb-cell"><div class="mini">{{ art(p) }}</div></td>
+        <td><b>{{ p.nama }}</b><br><span class="mute small">{{ (p.deskripsi or '')[:60] }}</span></td>
+        <td>{{ p.harga|harga }}</td>
+        <td><span class="pill {{ 's-dibatalkan' if p.stok == 0 else ('s-menunggu_verifikasi' if p.stok <= 5 else 's-lunas') }}">{{ p.stok }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('admin_stock', pid=p.id) }}" class="inline-form">
+            <input type="number" name="delta" value="1" aria-label="Jumlah perubahan stok" style="width:70px">
+            <button class="btn sm ghost" type="submit">Ubah</button>
+          </form>
+        </td>
+        <td class="row-gap">
+          <button class="btn sm ghost edit-product" type="button"
+            data-id="{{ p.id }}" data-nama="{{ p.nama }}" data-deskripsi="{{ p.deskripsi or '' }}"
+            data-harga="{{ p.harga }}" data-stok="{{ p.stok }}">Edit</button>
+          <form method="post" action="{{ url_for('admin_product_delete', pid=p.id) }}" onsubmit="return confirm('Hapus {{ p.nama }}?')">
+            <button class="btn sm danger" type="submit">Hapus</button></form>
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="mute">Belum ada produk.</td></tr>{% endfor %}
+    </tbody></table></div>
+  <p class="mute small">Kolom “Atur stok”: isi angka positif untuk menambah, negatif untuk mengurangi.</p>
+</div>
+
+<dialog id="productDialog" class="dialog">
+  <form method="post" enctype="multipart/form-data" class="dialog-form">
+    <h2 class="h3" id="dlgTitle">Tambah produk</h2>
+    <input type="hidden" name="id" id="f_id">
+    <label class="field"><span>Nama produk</span><input name="nama" id="f_nama" required></label>
+    <label class="field"><span>Deskripsi</span><textarea name="deskripsi" id="f_deskripsi" rows="3"></textarea></label>
+    <div class="two">
+      <label class="field"><span>Harga (Rp) — kosong = belum dijual</span><input type="number" name="harga" id="f_harga" min="0" placeholder="Kosongkan dulu"></label>
+      <label class="field"><span>Stok</span><input type="number" name="stok" id="f_stok" min="0" required></label>
+    </div>
+    <label class="field"><span>Foto produk (opsional, maks 4 MB)</span><input type="file" name="gambar" accept="image/png,image/jpeg,image/webp"></label>
+    <div class="row-gap end">
+      <button type="button" class="btn ghost" id="dlgCancel">Batal</button>
+      <button type="submit" class="btn">Simpan produk</button>
+    </div>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const dlg = document.getElementById('productDialog');
+  const f = id => document.getElementById('f_' + id);
+  function open(d) {
+    document.getElementById('dlgTitle').textContent = d ? 'Edit produk' : 'Tambah produk';
+    ['id','nama','deskripsi','harga','stok'].forEach(k => f(k).value = d ? (k === 'harga' && d[k] === '0' ? '' : d[k]) : '');
+    if (!d) f('stok').value = 0;
+    dlg.showModal();
+  }
+  document.getElementById('newProduct').addEventListener('click', () => open(null));
+  document.querySelectorAll('.edit-product').forEach(b => b.addEventListener('click', () => open(b.dataset)));
+  document.getElementById('dlgCancel').addEventListener('click', () => dlg.close());
+})();
+</script>
+{% endblock %}

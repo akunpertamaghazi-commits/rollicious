@@ -1,0 +1,44 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Dashboard admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block admin_content %}
+<div class="stat-grid">
+  <div class="stat"><span>Pendapatan terverifikasi</span><strong>{{ stat.pendapatan|rupiah }}</strong></div>
+  <div class="stat"><span>Saldo kas</span><strong>{{ stat.saldo|rupiah }}</strong></div>
+  <a class="stat link {{ 'alert' if stat.verifikasi }}" href="{{ url_for('admin_payments', status='menunggu_verifikasi') }}"><span>Menunggu verifikasi</span><strong>{{ stat.verifikasi }}</strong></a>
+  <div class="stat"><span>Pesanan perlu diproses</span><strong>{{ stat.pesanan_baru }}</strong></div>
+  {% if stat.terlambat %}<a class="stat link alert" href="{{ url_for('admin_payments', status='terlambat') }}"><span>Pembayaran terlambat (perlu tindakan)</span><strong>{{ stat.terlambat }}</strong></a>{% endif %}
+  <div class="stat"><span>Pelanggan</span><strong>{{ stat.pelanggan }}</strong></div>
+  <div class="stat"><span>Produk</span><strong>{{ stat.produk }}</strong></div>
+</div>
+
+<div class="two-col">
+  <div class="panel">
+    <h2 class="h3">Pendapatan 7 hari terakhir</h2>
+    <div class="bars">
+      {% for c in chart %}
+      <div class="bar"><span class="bar-val">{{ (c.v / 1000)|round|int }}k</span>
+        <i style="height: {{ (c.v / peak * 100)|round }}%"></i><span class="bar-lbl">{{ c.label }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="panel">
+    <h2 class="h3">Stok menipis</h2>
+    {% if low %}
+    <ul class="lines">{% for p in low %}<li><span>{{ p.nama }}</span><strong class="{{ 'bad' if p.stok == 0 }}">{{ p.stok }}</strong></li>{% endfor %}</ul>
+    {% else %}<p class="mute">Semua stok aman.</p>{% endif %}
+  </div>
+</div>
+
+<div class="panel">
+  <h2 class="h3">Pesanan terbaru</h2>
+  {% if recent %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Pelanggan</th><th>Total</th><th>Status</th><th>Waktu</th></tr></thead>
+    <tbody>{% for o in recent %}
+      <tr><td>{{ o.id }}</td><td>{{ o.nama }}</td><td>{{ o.total|rupiah }}</td>
+      <td><span class="pill s-{{ o.status_order }}">{{ o.status_order|status }}</span></td><td>{{ o.created_at|tgl }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<p class="mute">Belum ada pesanan masuk.</p>{% endif %}
+</div>
+{% endblock %}

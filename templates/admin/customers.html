@@ -1,0 +1,23 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Pelanggan{% endblock %}
+{% block page_title %}Pelanggan{% endblock %}
+{% block page_actions %}<a class="btn ghost" href="{{ url_for('admin_analytics') }}">Lihat analitik & skor pelanggan</a>{% endblock %}
+{% block admin_content %}
+<div class="panel"><div class="table-wrap"><table>
+  <thead><tr><th>#</th><th>Pelanggan</th><th>Alamat</th><th>Pesanan</th><th>Total belanja</th><th>Sosial media (input nilai)</th></tr></thead>
+  <tbody>{% for c in customers %}
+    <tr><td>{{ c.id }}</td>
+    <td><b>{{ c.nama }}</b><br><span class="mute small">{{ c.no_telepon }} · {{ c.created_at|tgl }}</span></td>
+    <td class="mute small">{{ c.alamat or '-' }}</td>
+    <td>{{ c.jml_order }}</td><td>{{ c.belanja|rupiah }}</td>
+    <td>
+      <form method="post" action="{{ url_for('admin_customer_social', uid=c.id) }}" class="social-form">
+        <input name="instagram" value="{{ c.instagram or '' }}" placeholder="instagram" maxlength="31" aria-label="Instagram {{ c.nama }}">
+        <input name="tiktok" value="{{ c.tiktok or '' }}" placeholder="tiktok" maxlength="31" aria-label="TikTok {{ c.nama }}">
+        <input name="pengikut" type="number" min="0" value="{{ c.pengikut or 0 }}" title="Jumlah pengikut" aria-label="Pengikut {{ c.nama }}">
+        <button class="btn sm ghost" type="submit">Simpan</button>
+      </form>
+    </td></tr>
+  {% else %}<tr><td colspan="6" class="mute">Belum ada pelanggan terdaftar.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Analitik{% endblock %}
+{% block page_title %}Analitik & perhitungan{% endblock %}
+{% block admin_content %}
+
+<div class="stat-grid">
+  <div class="stat"><span>Rata-rata nilai pesanan (AOV)</span><strong>{{ kpi.aov|rupiah }}</strong></div>
+  <div class="stat"><span>Pembeli berulang (repeat rate)</span><strong>{{ kpi.repeat_rate }}%</strong></div>
+  <div class="stat"><span>Tingkat sukses pembayaran</span><strong>{{ kpi.sukses_bayar }}%</strong></div>
+  <div class="stat"><span>Rata-rata waktu bayar</span><strong>{{ (kpi.rata_menit_bayar ~ ' mnt') if kpi.rata_menit_bayar is not none else '-' }}</strong></div>
+</div>
+
+<div class="panel">
+  <h2 class="h3">Peramalan penjualan 7 hari ke depan</h2>
+  {% if fc.ada_data %}
+  {% set all_v = (fc.series[-14:] | map(attribute=1) | list) + (fc.pred | map(attribute=1) | list) %}
+  {% set peak = ([all_v | max, 1] | max) %}
+  <div class="bars">
+    {% for d, v in fc.series[-14:] %}<div class="bar"><span class="bar-val">{{ (v / 1000)|round|int }}k</span><i style="height: {{ (v / peak * 100)|round }}%"></i><span class="bar-lbl">{{ d[8:] }}/{{ d[5:7] }}</span></div>{% endfor %}
+    {% for d, v in fc.pred %}<div class="bar pred"><span class="bar-val">{{ (v / 1000)|round|int }}k</span><i style="height: {{ (v / peak * 100)|round }}%"></i><span class="bar-lbl">{{ d[8:] }}/{{ d[5:7] }}</span></div>{% endfor %}
+  </div>
+  <p class="mute small">Batang polos = realisasi 14 hari terakhir, batang bergaris = prediksi.</p>
+  <dl class="kv">
+    <div><dt>Tren penjualan</dt><dd>{{ fc.trend }}</dd></div>
+    <div><dt>Persamaan garis tren</dt><dd>y = {{ fc.intercept|round(0)|int }} {{ '+' if fc.slope >= 0 else '−' }} {{ fc.slope|abs|round(1) }}·x</dd></div>
+    <div><dt>Kecocokan model (R²)</dt><dd>{{ (fc.r2 * 100)|round(1) }}%</dd></div>
+    <div><dt>Rata-rata bergerak 7 hari</dt><dd>{{ fc.ma7|rupiah }} / hari</dd></div>
+    <div><dt>Perkiraan total 7 hari ke depan</dt><dd>{{ fc.total_pred|rupiah }}</dd></div>
+  </dl>
+  {% else %}<p class="mute">Belum ada transaksi lunas dalam 28 hari terakhir, jadi belum ada yang bisa diramalkan.</p>{% endif %}
+  <details class="more"><summary>Cara hitung</summary>
+    <p class="mute small">Omzet harian 28 hari terakhir (hari tanpa penjualan dihitung 0) dicocokkan ke garis lurus y = a + b·x dengan metode kuadrat terkecil: b = Σ(x−x̄)(y−ȳ) / Σ(x−x̄)², a = ȳ − b·x̄. Prediksi hari ke-n adalah a + b·(28+n−1), tidak pernah di bawah 0. R² menunjukkan seberapa baik garis mengikuti data (makin dekat 100% makin bisa dipercaya). Tren dinilai naik/turun bila perubahan garis selama 28 hari lebih dari 15% dari rata-rata. Dengan data sedikit, hasil hanya perkiraan kasar.</p>
+  </details>
+</div>
+
+<div class="panel">
+  <h2 class="h3">Segmentasi pelanggan (RFM) dan skor pengaruh sosmed</h2>
+  <div class="chips">{% for name, s in segs %}<span class="pill">{{ name }}: {{ s.n }} orang · {{ s.omzet|rupiah }}</span>{% endfor %}</div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Pelanggan</th><th>Terakhir beli</th><th>R</th><th>F</th><th>M</th><th>Segmen</th><th>Sosmed</th><th>Pengikut</th><th>Skor pengaruh</th></tr></thead>
+    <tbody>{% for c in customers %}
+      <tr><td><b>{{ c.nama }}</b></td>
+      <td>{{ (c.recency ~ ' hari lalu') if c.recency is not none else '-' }}</td>
+      <td>{{ c.R or '-' }}</td><td>{{ c.F or '-' }}</td><td>{{ c.M or '-' }}</td>
+      <td><span class="pill">{{ c.segmen }}</span></td>
+      <td class="small">{% if c.instagram %}IG @{{ c.instagram }}{% endif %}{% if c.instagram and c.tiktok %}<br>{% endif %}{% if c.tiktok %}TT @{{ c.tiktok }}{% endif %}{% if not c.instagram and not c.tiktok %}-{% endif %}</td>
+      <td>{{ c.pengikut }}</td>
+      <td><b>{{ c.pengaruh }}</b> <span class="mute small">{{ c.label_pengaruh }}</span></td></tr>
+    {% else %}<tr><td colspan="9" class="mute">Belum ada pelanggan.</td></tr>{% endfor %}</tbody></table></div>
+  <details class="more"><summary>Cara hitung</summary>
+    <p class="mute small"><b>RFM:</b> R = berapa hari sejak pembelian lunas terakhir, F = jumlah pesanan lunas, M = total belanja. Tiap nilai diberi skor 1–5 menurut peringkat persentil di antara semua pembeli (5 = terbaik; nilai kembar mendapat skor sama). Segmen: Champion (R≥4 dan F≥4), Loyal (R≥3 dan F≥3), Pelanggan baru (R≥4 dan F≤2), Berisiko pergi (R≤2 dan F≥3), Tidur (R≤2), selain itu Menengah.</p>
+    <p class="mute small"><b>Skor pengaruh (0–100):</b> 100 × (0,6 × log₁₀(1+pengikut) ÷ log₁₀(1+pengikut terbesar) + 0,4 × belanja ÷ belanja terbesar). Skala logaritma dipakai agar akun berpengikut jutaan tidak mengalahkan semua orang. ≥70 = calon brand ambassador, 40–69 = potensial. Pengikut diisi pelanggan sendiri atau admin, jadi tidak diverifikasi.</p>
+  </details>
+</div>
+
+<div class="panel">
+  <h2 class="h3">Rekomendasi restock stok</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Produk</th><th>Stok</th><th>Laju jual / hari</th><th>Titik pesan ulang</th><th>Stok habis dalam</th><th>Saran tambah stok</th><th>Status</th></tr></thead>
+    <tbody>{% for r in restock %}
+      <tr><td>{{ r.nama }}</td><td>{{ r.stok }}</td><td>{{ r.laju }}</td><td>{{ r.rop }}</td>
+      <td>{{ (r.hari_habis ~ ' hari') if r.hari_habis is not none else '-' }}</td><td>{{ r.saran }}</td>
+      <td><span class="pill {{ 's-dibatalkan' if r.status in ('Habis','Restock sekarang') else ('s-menunggu_pembayaran' if r.status == 'Segera' else 's-lunas') }}">{{ r.status }}</span></td></tr>
+    {% endfor %}</tbody></table></div>
+  <details class="more"><summary>Cara hitung</summary>
+    <p class="mute small">Laju jual v = rata-rata unit terjual per hari dalam 14 hari terakhir (σ = simpangan bakunya). Titik pesan ulang ROP = v × L + z × σ × √L dengan lead time L = 3 hari dan z = 1,65 (kepastian stok sekitar 95%). Saran tambah stok = stok target (v × (L+7) + z × σ × √(L+7)) dikurangi stok sekarang, yaitu cukup untuk lead time ditambah satu minggu. Stok ≤ ROP berarti restock sekarang.</p>
+  </details>
+</div>
+
+<div class="two-col">
+  <div class="panel">
+    <h2 class="h3">Analisis ABC produk</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Produk</th><th>Omzet</th><th>Porsi</th><th>Kumulatif</th><th>Kelas</th></tr></thead>
+      <tbody>{% for a in abc %}<tr><td>{{ a.nama }}</td><td>{{ a.omzet|rupiah }}</td><td>{{ a.share }}%</td><td>{{ a.kum }}%</td><td><span class="pill {{ 's-lunas' if a.kelas == 'A' else ('s-menunggu_verifikasi' if a.kelas == 'B' else '') }}">{{ a.kelas }}</span></td></tr>
+      {% else %}<tr><td colspan="5" class="mute">Belum ada penjualan.</td></tr>{% endfor %}</tbody></table></div>
+    <p class="mute small">Produk diurutkan dari omzet terbesar. Kelas A menyumbang ±80% omzet pertama, B hingga 95%, sisanya C (prinsip Pareto).</p>
+  </div>
+  <div class="panel">
+    <h2 class="h3">Rasa yang sering dibeli bersamaan</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Pasangan</th><th>Pesanan</th><th>Support</th><th>Lift</th></tr></thead>
+      <tbody>{% for p in pairs[:8] %}<tr><td>{{ p.a }} + {{ p.b }}</td><td>{{ p.n }}</td><td>{{ p.support }}%</td><td>{{ p.lift }}</td></tr>
+      {% else %}<tr><td colspan="4" class="mute">Belum ada pesanan dengan lebih dari satu produk.</td></tr>{% endfor %}</tbody></table></div>
+    <p class="mute small">Dari {{ n_orders }} pesanan lunas. Support = persentase pesanan berisi kedua produk. Lift &gt; 1 artinya keduanya lebih sering dibeli bersama daripada kebetulan, cocok untuk paket bundling.</p>
+  </div>
+</div>
+{% endblock %}

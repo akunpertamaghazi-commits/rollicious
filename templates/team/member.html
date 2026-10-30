@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}{{ m.nama }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/team.css') }}">{% endblock %}
+{% block body_class %}theme-{{ m.tema }}{% endblock %}
+{% block content %}
+<div class="t-fx" data-fx="{{ m.tema }}" aria-hidden="true"></div>
+
+<section class="wrap member-hero">
+  <div class="avatar-wrap" data-tilt>
+    <div class="avatar-ring"></div>
+    <div class="avatar">
+      {% if foto %}<img src="{{ url_for('static', filename='images/team/' + foto) }}" alt="Foto {{ m.nama }}">
+      {% else %}<span>{{ m.nama.split()[-1][:1] }}{{ m.nama.split()[0][:1] }}</span>{% endif %}
+    </div>
+  </div>
+  <div class="member-intro">
+    <p class="member-no">Anggota {{ idx }} dari {{ total }}</p>
+    <h1 class="member-name" aria-label="{{ m.nama }}">{% for ch in m.nama %}<span aria-hidden="true" style="--i: {{ loop.index0 }}">{{ '\u00a0' if ch == ' ' else ch }}</span>{% endfor %}</h1>
+    <p class="member-role">{{ m.peran }}</p>
+    <blockquote class="member-quote">“{{ m.kutipan }}”</blockquote>
+    <div class="row-gap">
+      {% if m.instagram %}<a class="btn" href="https://instagram.com/{{ m.instagram }}" target="_blank" rel="noopener noreferrer">Instagram</a>{% endif %}
+      {% if m.email %}<a class="btn ghost" href="mailto:{{ m.email }}">Email</a>{% endif %}
+      <a class="btn ghost" href="{{ url_for('team_index') }}">Semua anggota</a>
+    </div>
+  </div>
+</section>
+
+<section class="wrap member-grid">
+  <article class="tpanel rv">
+    <h2 class="h3">Biodata</h2>
+    <dl class="bio">
+      <div><dt>Nama lengkap</dt><dd>{{ m.nama }}</dd></div>
+      <div><dt>NIM</dt><dd>{{ m.nim }}</dd></div>
+      <div><dt>Program studi</dt><dd>{{ m.prodi }}</dd></div>
+      <div><dt>Kampus</dt><dd>{{ m.kampus }}</dd></div>
+      <div><dt>Kelas</dt><dd>{{ m.kelas }}</dd></div>
+      <div><dt>Kota</dt><dd>{{ m.kota }}</dd></div>
+      <div><dt>Peran di tim</dt><dd>{{ m.peran }}</dd></div>
+    </dl>
+  </article>
+
+  <article class="tpanel rv">
+    <h2 class="h3">Tentang saya</h2>
+    <p>{{ m.tentang }}</p>
+    <h3 class="h4">Hobi</h3>
+    <div class="tags">{% for h in m.hobi %}<span class="tag">{{ h }}</span>{% endfor %}</div>
+  </article>
+
+  <article class="tpanel rv">
+    <h2 class="h3">Keahlian</h2>
+    <ul class="skills">
+      {% for nama, nilai in m.keahlian %}
+      <li><div class="skill-head"><span>{{ nama }}</span><b>{{ nilai }}%</b></div><div class="skill-bar"><i style="--w: {{ nilai }}%"></i></div></li>
+      {% endfor %}
+    </ul>
+  </article>
+
+  <article class="tpanel rv">
+    <h2 class="h3">Tugas di proyek Rollicios</h2>
+    <ol class="tasks">{% for t in m.tugas %}<li>{{ t }}</li>{% endfor %}</ol>
+  </article>
+</section>
+
+<nav class="wrap member-nav" aria-label="Anggota lain">
+  <a class="mn t-{{ prev.tema }}" href="{{ url_for('team_member', slug=prev.slug) }}"><small>‹ Sebelumnya</small><b>{{ prev.nama }}</b></a>
+  <a class="mn t-{{ nxt.tema }}" href="{{ url_for('team_member', slug=nxt.slug) }}"><small>Berikutnya ›</small><b>{{ nxt.nama }}</b></a>
+</nav>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='js/team.js') }}"></script>{% endblock %}

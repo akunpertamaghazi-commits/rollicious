@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import art %}
+{% block title %}Pesanan saya{% endblock %}
+{% block content %}
+<section class="wrap page-head"><h1 class="h1">Pesanan saya</h1></section>
+{% if data %}
+<section class="wrap stack">
+  {% for d in data %}
+  {% set o = d.o %}
+  {% set flow = ['menunggu_pembayaran','menunggu_verifikasi','lunas','diproses','dikirim','selesai'] %}
+  {% set idx = flow.index(o.status_order) if o.status_order in flow else -1 %}
+  <article class="panel order">
+    <header class="order-head">
+      <div><h2 class="h3">Pesanan #{{ o.id }}</h2><p class="mute small">{{ o.created_at|tgl }}</p></div>
+      <span class="pill s-{{ o.status_order }}">{{ o.status_order|status }}</span>
+    </header>
+
+    {% if o.status_order not in ('dibatalkan','refund') %}
+    <ol class="track">
+      {% for s in flow %}<li class="{{ 'done' if loop.index0 <= idx }}{{ ' now' if loop.index0 == idx }}"><i></i><span>{{ s|status }}</span></li>{% endfor %}
+    </ol>
+    {% endif %}
+
+    <ul class="lines">
+      {% for it in d['items'] %}
+      <li><span class="line-item"><span class="mini">{{ art({'id': it.pid, 'nama': it.nama, 'gambar': it.gambar}) }}</span>
+        <span>{{ it.nama }} <span class="mute">× {{ it.jumlah }}</span></span></span><span>{{ it.subtotal|rupiah }}</span></li>
+      {% endfor %}
+    </ul>
+
+    {% if o.alamat %}<p class="mute small">Dikirim ke: {{ o.alamat }}</p>{% endif %}
+    {% if o.kurir %}<p class="ship-info">Dikirim via <b>{{ o.kurir }}</b>{% if o.no_resi %} · resi <code>{{ o.no_resi }}</code>{% endif %}{% if o.dikirim_at %} · {{ o.dikirim_at|tgl }}{% endif %}</p>{% endif %}
+    {% if d.pay and d.pay.status == 'refund' %}<p class="notice soon">Dana {{ d.pay.refund_amount|rupiah }} dikembalikan pada {{ d.pay.refund_at|tgl }}.</p>{% endif %}
+    {% if d.pay and d.pay.status == 'terlambat' %}<p class="notice soon">Pembayaranmu masuk setelah pesanan kedaluwarsa. Admin akan memulihkan pesanan atau mengembalikan dana.</p>{% endif %}
+    <footer class="order-foot">
+      <strong>{{ o.total|rupiah }}</strong>
+      <div class="row-gap">
+        {% if o.status_order in ('menunggu_pembayaran','menunggu_verifikasi') %}
+          <a class="btn sm" href="{{ url_for('payment', oid=o.id) }}">{{ 'Bayar sekarang' if o.status_order == 'menunggu_pembayaran' else 'Lihat pembayaran' }}</a>
+        {% endif %}
+        {% if o.status_order == 'menunggu_pembayaran' %}
+          <form method="post" action="{{ url_for('order_cancel', oid=o.id) }}" onsubmit="return confirm('Batalkan pesanan ini?')"><button class="btn sm ghost">Batalkan</button></form>
+        {% endif %}
+      </div>
+    </footer>
+  </article>
+  {% endfor %}
+</section>
+{% else %}
+<section class="wrap empty-state">
+  <p class="h2">Belum ada pesanan.</p>
+  <p class="mute">Pesanan yang kamu buat akan muncul di sini.</p>
+  <a class="btn" href="{{ url_for('products') }}">Mulai belanja</a>
+</section>
+{% endif %}
+{% endblock %}

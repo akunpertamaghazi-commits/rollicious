@@ -1,0 +1,52 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Pembayaran{% endblock %}
+{% block page_title %}Pembayaran{% endblock %}
+{% block page_actions %}
+{% if gw_enabled %}<form method="post" action="{{ url_for('admin_reconcile') }}"><button class="btn ghost" type="submit">Rekonsiliasi pembayaran otomatis</button></form>{% endif %}
+{% endblock %}
+{% block admin_content %}
+{% if not gw_enabled %}<p class="notice soon">Gateway pembayaran otomatis belum aktif (MIDTRANS_SERVER_KEY belum diset). Pembayaran memakai verifikasi manual.</p>{% endif %}
+<div class="chips">
+  <a href="{{ url_for('admin_payments') }}" class="{{ 'on' if not st }}">Semua</a>
+  {% for k in ['terlambat','menunggu_verifikasi','lunas','refund','ditolak','belum_bayar','kedaluwarsa','gagal','dibatalkan'] %}<a href="{{ url_for('admin_payments', status=k) }}" class="{{ 'on' if st == k }}">{{ k|status }}</a>{% endfor %}
+</div>
+<div class="panel">
+  <div class="table-wrap"><table>
+    <thead><tr><th>Referensi</th><th>Pesanan</th><th>Pelanggan</th><th>Jalur</th><th>Jumlah</th><th>Status</th><th>Dibayar</th><th></th></tr></thead>
+    <tbody>
+    {% for p in payments %}
+      <tr>
+        <td><code>{{ p.payment_reference }}</code></td><td>#{{ p.order_id }}</td><td>{{ p.nama }}</td>
+        <td>{{ 'QRIS dinamis' if p.gateway else 'QRIS manual' }}</td>
+        <td>{{ p.jumlah|rupiah }}</td>
+        <td><span class="pill s-{{ p.status }}">{{ p.status|status }}</span>{% if p.gateway_status %}<br><span class="mute small">gateway: {{ p.gateway_status }}</span>{% endif %}</td>
+        <td>{{ p.paid_at|tgl }}</td>
+        <td class="row-gap">
+          {% if p.status == 'menunggu_verifikasi' and not p.gateway %}
+          <form method="post" action="{{ url_for('admin_payment_action', pid=p.id, aksi='lunas') }}"><button class="btn sm">Tandai lunas</button></form>
+          <form method="post" action="{{ url_for('admin_payment_action', pid=p.id, aksi='tolak') }}" onsubmit="return confirm('Tolak pembayaran ini?')"><button class="btn sm danger">Tolak</button></form>
+          {% endif %}
+          {% if p.gateway and p.status in ('belum_bayar','menunggu_verifikasi') %}
+          <form method="post" action="{{ url_for('admin_payment_check', pid=p.id) }}"><button class="btn sm ghost">Cek status</button></form>
+          {% endif %}
+          {% if p.status == 'terlambat' %}
+          <form method="post" action="{{ url_for('admin_payment_recover', pid=p.id) }}"><button class="btn sm">Pulihkan pesanan</button></form>
+          <a class="btn sm ghost" href="{{ url_for('admin_orders') }}">Refund di Pesanan</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="8" class="mute">Belum ada data pembayaran.</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+
+<div class="panel">
+  <h2 class="h3">Log notifikasi gateway (30 terakhir)</h2>
+  <p class="mute small">Setiap webhook dan pengecekan status dicatat di sini. Event dengan tanda tangan tidak valid atau nominal berbeda tidak pernah mengubah status pembayaran.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Waktu</th><th>Sumber</th><th>Order ID</th><th>Status</th><th>Valid</th><th>Hasil</th></tr></thead>
+    <tbody>{% for e in events %}
+      <tr><td>{{ e.created_at|tgl }}</td><td>{{ e.source }}</td><td><code>{{ e.order_ref }}</code></td><td>{{ e.transaction_status }} ({{ e.status_code }})</td>
+      <td>{{ 'ya' if e.valid else 'TIDAK' }}</td><td>{{ e.note }}</td></tr>
+    {% else %}<tr><td colspan="6" class="mute">Belum ada notifikasi.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}
