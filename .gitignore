@@ -9,3 +9,12 @@ database/*.db-shm
 backup_*.db
 static/images/products/
 static/images/qris/
+
+# Rollicios
+.secret_key
+database/*.db
+database/*.db-wal
+database/*.db-shm
+backup_*.db
+static/images/products/
+static/images/qris/
