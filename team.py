@@ -12,6 +12,7 @@ import os
 
 TEAM = [
     dict(slug="fahri dwi hariyanto", tema="mayo", nama="Fahri Dwi Hariyanto", peran="Ketua Kelompok & Koordinator",
+<<<<<<< HEAD
          nim="19261516", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
          tentang="rajn sholat kayanya mah",
          tugas=["Mengoordinasi jadwal dan pembagian tugas kelompok", "Menyusun laporan akhir dan presentasi"],
@@ -41,11 +42,46 @@ TEAM = [
          instagram="@rayhann908", email=""),
     dict(slug="Ahmad Ghazi Al-ghifary", tema="galaksi", nama="Ahmad Ghazi Al-ghifary", peran="Developer & oprasional",
          nim="19261504", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+=======
+         nim="00000000001", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="Tulis perkenalan singkat bae.",
+         tugas=["Mengoordinasi jadwal dan pembagian tugas kelompok", "Menyusun laporan akhir dan presentasi"],
+         keahlian=[("Kepemimpinan", 90), ("Komunikasi", 85), ("Manajemen waktu", 80)],
+         hobi=["Membaca", "Kuliner", "Traveling"], kutipan="Kerja sama membuat yang sulit terasa ringan.",
+         instagram="", email=""),
+    dict(slug="keyla ainurista", tema="keju", nama="Keyla Ainurista", peran="produksi",
+         nim="00000000002", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="perkenalan singkat ",
+         tugas=["singkat"],
+         keahlian=[("-", 88), ("-", 82), ("-", 78)],
+         hobi=["TIDUR, MAKAN, NONTON KPOP"], kutipan="-",
+         instagram="", email=""),
+    dict(slug="m.faizal afandi", tema="coklat", nama="Muhammad Faizal Afandi", peran="marketing & promosi",
+         nim="00000000003", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="Tulis perkenalan singkat tentang ",
+         tugas=["-"],
+         keahlian=[("-", 92), ("=", 84), ("-", 88)],
+         hobi=["-"], kutipan="-",
+         instagram="", email=""),
+    dict(slug="rayhan saputra", tema="matcha", nama="Rayhan Saputra", peran="Keuangan & Administrasi",
+         nim="00000000004", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+         tentang="Tulis perkenalan singkat.",
+         tugas=["Menentukan harga jual dan menghitung modal", "Mencatat kas masuk dan keluar", "Menyusun laporan keuangan"],
+         keahlian=[("Akuntansi dasar", 86), ("Excel", 90), ("Ketelitian", 94)],
+         hobi=["-"], kutipan="Angka yang jujur membuat usaha bertahan.",
+         instagram="", email=""),
+    dict(slug="Ahmad Ghazi Al-ghifary", tema="galaksi", nama="Ahmad Ghazi Al-ghifary", peran="Developer & oprasional",
+         nim="00000000005", prodi="sistem informasi", kampus="universita bina sarana informatika", kelas="19-1B-26", kota="Jakarta, slipi",
+>>>>>>> d6b832542e56438aa010ca30419ccbd72d12c2d3
          tentang="perkenalkan saya ahmad ghazi al-ghifary, saya adalah seorang mahasiswa sistem informasi di universitas bina sarana informatika. saya meiliki minat bakat dalam sebuah pengembangan teknologi",
          tugas=["Membuat konten dan jadwal posting", "Mengelola akun sosial media toko", "Merancang promo dan kemasan"],
          keahlian=[("HTML & CSS", 100), ("Python & Flask", 100), ("Basis data", 100)],
          hobi=["futsal, game, tidur"], kutipan="kalau berak sekebon cebok nya selaut",
+<<<<<<< HEAD
          instagram="@ahmdghzee", email="ghazialghifary12@Gmail.com"),
+=======
+         instagram="ahmdghzee", email="ghazialghifary12@Gmail.com"),
+>>>>>>> d6b832542e56438aa010ca30419ccbd72d12c2d3
 ]
 
 _EXT = ("jpg", "jpeg", "png", "webp")
